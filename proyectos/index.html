@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Proyectos</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tomato: '#FF3B1F',
+            violet: '#49267F',
+            steel: '#D9E0E8',
+            darkbg: '#071226',
+            darkpanel: '#0D1B33',
+            darkcard: '#10213F',
+            cyanx: '#00C2FF',
+            tealx: '#00FFC8',
+            mutedx: '#7E92B2'
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(0,0,0,0.25)',
+            glow: '0 0 0 1px rgba(0,194,255,0.15), 0 12px 40px rgba(0,194,255,0.08)',
+            glass: '0 20px 50px rgba(0,0,0,0.35)'
+          },
+          borderRadius: {
+            xl2: '1.25rem'
+          },
+          backdropBlur: {
+            xs: '2px'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(73,38,127,0.25), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(255,59,31,0.10), transparent 22%),
+        linear-gradient(180deg, #06101f 0%, #081426 100%);
+      color: #E8EDF5;
+      overflow: hidden;
+    }
+
+    .font-display {
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar,
+    .content-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb,
+    .content-scroll::-webkit-scrollbar-thumb {
+      background: rgba(126,146,178,0.35);
+      border-radius: 999px;
+    }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(0,194,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,194,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .module-btn.active {
+      background: linear-gradient(135deg, rgba(0,194,255,0.16), rgba(73,38,127,0.30));
+      border-color: rgba(0,194,255,0.35);
+      color: white;
+      box-shadow: 0 0 0 1px rgba(0,194,255,0.20), 0 12px 28px rgba(0,0,0,0.22);
+    }
+
+    .module-btn:hover {
+      border-color: rgba(0,194,255,0.25);
+      transform: translateX(2px);
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+    .custom-input {
+      width: 100%;
+      background: #0d1525;
+      border: 1px solid #1e3050;
+      border-radius: 12px;
+      color: #e8edf5;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      padding: 12px 48px 12px 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .custom-input::placeholder { color: #5a7090; }
+
+    .custom-input:focus {
+      border-color: #00c2ff;
+      box-shadow: 0 0 0 3px rgba(0,194,255,0.1);
+    }
+
+    .iva-btn {
+      flex: 1;
+      background: #0d1525;
+      border: 1px solid #1e3050;
+      border-radius: 12px;
+      color: #5a7090;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      padding: 12px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .iva-btn:hover { border-color: #00c2ff; color: #e8edf5; }
+
+    .iva-btn.active {
+      background: rgba(0,194,255,0.10);
+      border-color: #00c2ff;
+      color: #00c2ff;
+      box-shadow: 0 0 0 2px rgba(0,194,255,0.14);
+    }
+
+    .bar-fill {
+      transition: width 0.5s cubic-bezier(0.25,0.8,0.25,1), background 0.5s;
+    }
+
+    @keyframes pulse-glow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,194,255,0); }
+      50% { box-shadow: 0 0 20px 4px rgba(0,194,255,0.20); }
+    }
+
+    .hero-pulse {
+      animation: pulse-glow 0.9s ease;
+    }
+
+    .login-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(0,194,255,0.22), transparent 22%),
+        radial-gradient(circle at 80% 15%, rgba(73,38,127,0.35), transparent 28%),
+        radial-gradient(circle at 70% 75%, rgba(255,59,31,0.10), transparent 20%),
+        linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+        linear-gradient(180deg, #0a1424 0%, #0c182b 100%);
+    }
+
+    .login-glass {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .login-input {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(0,255,200,0.35);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      padding: 14px 16px;
+      outline: none;
+      transition: all .2s ease;
+    }
+
+    .login-input::placeholder {
+      color: rgba(232,237,245,0.68);
+    }
+
+    .login-input:focus {
+      border-color: rgba(0,194,255,0.7);
+      box-shadow: 0 0 0 3px rgba(0,194,255,0.10);
+      background: rgba(255,255,255,0.10);
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        overflow: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- LOGIN -->
+  <section id="loginScreen" class="login-bg min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md rounded-[2rem] login-glass px-6 sm:px-8 py-8 text-white">
+      <div class="text-center">
+        <h1 class="font-display text-5xl sm:text-6xl font-bold leading-none">Iniciar sesión</h1>
+        <p class="mt-3 text-base sm:text-lg text-white/75">
+          Accede a tu portal de proyectos
+        </p>
+      </div>
+
+      <div class="mt-8 space-y-4">
+        <input
+          id="loginUser"
+          type="text"
+          placeholder="Usuario o correo"
+          class="login-input"
+          autocomplete="username"
+        />
+
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Contraseña"
+          class="login-input"
+          autocomplete="current-password"
+        />
+
+        <button
+          id="btnLogin"
+          class="w-full rounded-[1.25rem] bg-cyanx/25 border border-cyanx/60 text-white py-4 font-semibold text-lg hover:bg-cyanx/30 transition-all"
+        >
+          Ingresar
+        </button>
+      </div>
+
+      <div class="mt-6 text-center text-sm text-white/65">
+        Usuario: <span class="font-semibold text-white">lfagurto</span> · Contraseña: <span class="font-semibold text-white">170290</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTAL -->
+  <div id="portalApp" class="hidden min-h-screen lg:h-screen lg:overflow-hidden grid grid-cols-1 lg:grid-cols-[290px_minmax(0,1fr)]">
+
+    <!-- SIDEBAR -->
+    <aside class="bg-darkpanel/95 border-r border-cyanx/10 shadow-soft lg:h-screen lg:overflow-hidden">
+      <div class="h-full flex flex-col">
+        <div class="px-5 py-5 border-b border-cyanx/10">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-violet flex items-center justify-center shadow-glow shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 5.75A2.75 2.75 0 0 1 6.75 3h10.5A2.75 2.75 0 0 1 20 5.75v12.5A2.75 2.75 0 0 1 17.25 21H6.75A2.75 2.75 0 0 1 4 18.25V5.75Zm4 1.5a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5H8Zm0 4a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5H8Zm0 4a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5H8Z"/>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h1 class="font-display text-2xl font-bold tracking-wide text-white leading-none">Portal</h1>
+              <p class="text-sm text-mutedx mt-1">Sistema de proyectos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-scroll flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
+                <span id="sessionDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                <span id="sessionLabel">Activa</span>
+              </span>
+            </div>
+
+            <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.18em] text-mutedx">Usuario</p>
+              <p id="activeUsername" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
+            </div>
+
+            <button id="btnLogout" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
+              Cerrar sesión
+            </button>
+          </div>
+
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <h2 class="text-sm uppercase tracking-[0.20em] text-mutedx font-semibold">Módulos</h2>
+              <span class="text-xs text-cyanx font-semibold">2</span>
+            </div>
+
+            <div class="space-y-2">
+              <button id="btnModuloCalculoEspecial"
+                class="module-btn active w-full text-left rounded-2xl border border-cyanx/10 bg-darkbg px-4 py-4 transition-all">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="font-bold text-white leading-6">CÁLCULO DESCUENTO ESPECIAL</p>
+                    <p class="text-xs text-mutedx mt-1">calculo_descuento_especial</p>
+                  </div>
+                  <span class="w-3 h-3 rounded-full bg-tealx mt-1 shrink-0"></span>
+                </div>
+              </button>
+
+              <button id="btnModuloCalculo"
+                class="module-btn w-full text-left rounded-2xl border border-cyanx/10 bg-darkbg px-4 py-4 transition-all">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="font-bold text-white leading-6">CÁLCULO DESCUENTO</p>
+                    <p class="text-xs text-mutedx mt-1">calculo_descuento</p>
+                  </div>
+                  <span class="w-3 h-3 rounded-full bg-slate-500 mt-1 shrink-0"></span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4">
+            <p class="text-xs uppercase tracking-[0.20em] text-mutedx font-semibold mb-3">Notas</p>
+            <p class="text-sm text-steel/80 leading-6">
+              El módulo actual es <strong>calculo_descuento_especial</strong>. El siguiente módulo es <strong>calculo_descuento</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="min-w-0 lg:h-screen lg:overflow-hidden flex flex-col">
+      <header class="border-b border-cyanx/10 bg-darkpanel/80 backdrop-blur-sm px-5 sm:px-6 py-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <p class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Proyecto activo</p>
+            <h2 id="pageTitle" class="text-2xl sm:text-3xl font-display font-bold text-white leading-none mt-1">
+              CÁLCULO DESCUENTO ESPECIAL
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
+              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Módulos</p>
+              <p id="kpiModules" class="text-2xl font-display font-bold text-white mt-1">2</p>
+            </div>
+            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
+              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Estado</p>
+              <p id="kpiState" class="text-2xl font-display font-bold text-tealx mt-1">Activo</p>
+            </div>
+            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
+              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Tipo</p>
+              <p id="kpiType" class="text-2xl font-display font-bold text-white mt-1">Utilitario</p>
+            </div>
+            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
+              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Vista</p>
+              <p id="kpiView" class="text-2xl font-display font-bold text-cyanx mt-1">Interna</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content-scroll flex-1 overflow-y-auto p-4 sm:p-6 grid-bg">
+        <div class="rounded-[1.5rem] bg-darkpanel/80 border border-cyanx/10 shadow-soft overflow-hidden">
+          <div class="px-5 py-4 border-b border-cyanx/10 bg-darkcard/80">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Módulo activo</p>
+                <h3 id="moduleTitle" class="text-xl font-display font-bold text-white mt-1">CÁLCULO DESCUENTO ESPECIAL</h3>
+              </div>
+              <span id="moduleBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyanx/10 text-cyanx text-xs font-semibold">
+                calculo_descuento_especial
+              </span>
+            </div>
+          </div>
+
+          <!-- MODULO 1 -->
+          <div id="view-calc-especial" class="p-4 sm:p-6">
+            <div class="min-h-0 rounded-[1.5rem] overflow-hidden bg-[#0b0f1a] text-[#e8edf5]"
+              style="background-image:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,194,255,0.07), transparent),
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,80,0.25) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,80,0.12) 40px);">
+
+              <header class="relative bg-gradient-to-br from-[#0d1a2e] to-[#0b1520] border-b border-[#1e3050] overflow-hidden">
+                <div class="absolute top-[-60px] right-[-60px] w-48 h-48 rounded-full"
+                     style="background: radial-gradient(circle, rgba(0,194,255,0.06) 0%, transparent 70%)"></div>
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
+                  <div class="relative shrink-0 w-11 h-11 border border-[#00c2ff] rounded-lg flex items-center justify-center">
+                    <span class="font-display text-lg font-bold text-[#00c2ff] relative z-10">%</span>
+                    <div class="absolute inset-[3px] rounded-md" style="background:rgba(0,194,255,0.07)"></div>
+                  </div>
+                  <div>
+                    <h1 class="font-display text-lg sm:text-2xl font-bold tracking-[0.18em] uppercase text-slate-100">
+                      <span class="text-[#00c2ff]">CÁLCULO</span> DESCUENTO ESPECIAL
+                    </h1>
+                    <p class="text-[10px] tracking-[0.18em] uppercase text-[#5a7090] mt-0.5">
+                      Herramienta de margen y precio especial
+                    </p>
+                  </div>
+                </div>
+              </header>
+
+              <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-4 pb-5">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+
+                  <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-4 overflow-hidden">
+                    <div class="flex items-center gap-3 mb-6">
+                      <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Datos del producto</span>
+                      <span class="flex-1 h-px bg-[#1e3050]"></span>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                      <div>
+                        <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-2">% IVA</label>
+                        <div class="flex gap-3">
+                          <button type="button" class="iva-btn" id="iva-btn-0" onclick="selectIva(0)">0%</button>
+                          <button type="button" class="iva-btn" id="iva-btn-15" onclick="selectIva(15)">15%</button>
+                        </div>
+                        <input type="hidden" id="iva" value="" />
+                      </div>
+
+                      <div>
+                        <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+                          PVP + IVA — Precio de Venta al Público + IVA
+                        </label>
+                        <div class="relative">
+                          <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+                          <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+                          COSTO SIN IVA
+                        </label>
+                        <div class="relative">
+                          <input id="costo" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+                          <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+                          UTILIDAD A APLICAR
+                        </label>
+                        <div class="relative">
+                          <input id="utilidad" type="number" placeholder="0.00" step="0.1" min="0" max="99" class="custom-input" />
+                          <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onclick="calcular()"
+                      class="font-display mt-4 w-full py-3 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-[#0b0f1a] hover:opacity-90 active:scale-[0.99] transition-all"
+                      style="background: linear-gradient(135deg, #00c2ff, #00ffc8)">
+                      CALCULAR
+                    </button>
+
+                    <button onclick="resetear()"
+                      class="mt-2.5 w-full py-2 rounded-lg border border-[#1e3050] text-[#5a7090] text-xs hover:text-slate-300 hover:border-[#5a7090] transition-all">
+                      ↺ Limpiar
+                    </button>
+                  </div>
+
+                  <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-4 overflow-hidden flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Resultados</span>
+                      <span class="flex-1 h-px bg-[#1e3050]"></span>
+                    </div>
+
+                    <div id="warning-box" class="hidden flex-row items-start gap-3 rounded-xl px-4 py-3 text-sm"
+                         style="background:rgba(255,78,106,0.08); border:1px solid rgba(255,78,106,0.3); color:#ff4e6a;">
+                      <span class="shrink-0 mt-0.5">⚠</span>
+                      <span id="warning-msg"></span>
+                    </div>
+
+                    <div id="hero-result"
+                         class="relative overflow-hidden rounded-xl px-5 py-5"
+                         style="background:linear-gradient(135deg,rgba(0,194,255,0.07) 0%,rgba(0,255,200,0.04) 100%); border:1px solid rgba(0,194,255,0.28);">
+                      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <p class="text-[9px] tracking-[0.2em] uppercase text-[#5a7090] mb-1">Descuento Porcentual (DESC. NUEVO)</p>
+                          <p id="r-desc-pct" class="font-display text-5xl font-bold leading-none text-[#5a7090] transition-all">—</p>
+                          <p id="r-desc-sub" class="text-[10px] text-[#5a7090] mt-2">ingresa los datos y calcula</p>
+                        </div>
+                        <div class="sm:text-right">
+                          <p class="text-[9px] tracking-[0.2em] uppercase text-[#5a7090] mb-1">Precio Especial + IVA</p>
+                          <p id="r-precio-esp" class="font-display text-4xl font-bold leading-none text-[#5a7090] transition-all">—</p>
+                          <p id="r-precio-sub" class="text-[10px] text-[#5a7090] mt-2">&nbsp;</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+                        <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Costo + IVA</p>
+                        <p id="r-costo-iva" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+                      </div>
+                      <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+                        <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Rentabilidad Porcentual</p>
+                        <p id="r-rentabilidad" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+                      </div>
+                    </div>
+
+                    <div class="rounded-xl px-4 py-3.5" style="background:#1a2236; border:1px solid #1e3050;">
+                      <div class="flex justify-between items-center mb-2.5">
+                        <span class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090]">Margen actual sobre PVP</span>
+                        <span id="bar-pct-txt" class="font-display text-sm font-semibold text-slate-400">—</span>
+                      </div>
+                      <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.05);">
+                        <div id="bar-fill" class="bar-fill h-full rounded-full w-0"
+                             style="background:linear-gradient(90deg,#00c2ff,#00ffc8)"></div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div id="card-uti" class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+                        <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">% Utilidad Final</p>
+                        <p id="r-uti-final" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+                      </div>
+                      <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+                        <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Valor Descuento ($)</p>
+                        <p id="r-valor-desc" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="text-center text-[10px] tracking-widest uppercase text-[#5a7090] mt-8 opacity-50">
+                  Presiona Enter para calcular rápidamente
+                </p>
+              </main>
+            </div>
+          </div>
+
+          <!-- MODULO 2 -->
+<div id="view-calc-normal" class="p-4 sm:p-6 hidden">
+  <div class="rounded-[1.5rem] border border-cyanx/10 bg-darkbg overflow-hidden">
+    <iframe
+      id="frameCalcNormal"
+      class="w-full h-[78vh] border-0 bg-white"
+      title="CÁLCULO DESCUENTO">
+    </iframe>
+  </div>
+</div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const LOGIN_USER = "lfagurto";
+    const LOGIN_PASSWORD = "170290";
+    const LOGIN_SESSION_KEY = "portal_login_ok";
+    const LOGIN_USER_KEY = "portal_login_user";
+
+    function showPortal() {
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("portalApp").classList.remove("hidden");
+      const savedUser = sessionStorage.getItem(LOGIN_USER_KEY) || LOGIN_USER;
+      document.getElementById("activeUsername").textContent = savedUser;
+    }
+
+    function showLogin() {
+      document.getElementById("portalApp").classList.add("hidden");
+      document.getElementById("loginScreen").classList.remove("hidden");
+      document.getElementById("loginPassword").value = "";
+    }
+
+    function isLoggedIn() {
+      return sessionStorage.getItem(LOGIN_SESSION_KEY) === "1";
+    }
+
+    function login() {
+      const user = document.getElementById("loginUser").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!user || !password) {
+        Swal.fire({
+          icon: "warning",
+          title: "Campos requeridos",
+          text: "Debes ingresar usuario y contraseña.",
+          confirmButtonColor: "#49267F",
+          background: "#10213F",
+          color: "#E8EDF5"
+        });
+        return;
+      }
+
+      if (user === LOGIN_USER && password === LOGIN_PASSWORD) {
+        sessionStorage.setItem(LOGIN_SESSION_KEY, "1");
+        sessionStorage.setItem(LOGIN_USER_KEY, user);
+        showPortal();
+
+        Swal.fire({
+          icon: "success",
+          title: "Bienvenido",
+          text: "Has iniciado sesión correctamente.",
+          confirmButtonColor: "#49267F",
+          background: "#10213F",
+          color: "#E8EDF5",
+          timer: 1400,
+          showConfirmButton: false
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Acceso denegado",
+          text: "Usuario o contraseña incorrectos.",
+          confirmButtonColor: "#FF3B1F",
+          background: "#10213F",
+          color: "#E8EDF5"
+        });
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem(LOGIN_SESSION_KEY);
+      sessionStorage.removeItem(LOGIN_USER_KEY);
+      showLogin();
+    }
+    const frameCalcNormal = document.getElementById("frameCalcNormal");
+if (frameCalcNormal) {
+  const currentPath = window.location.pathname.toLowerCase();
+
+  if (currentPath.includes("/proyectos/")) {
+    frameCalcNormal.src = "./calculo_descuento/index.html";
+  } else {
+    frameCalcNormal.src = "./proyectos/calculo_descuento/index.html";
+  }
+}
+
+    function activarModulo(modulo) {
+      const btnEspecial = document.getElementById("btnModuloCalculoEspecial");
+      const btnNormal = document.getElementById("btnModuloCalculo");
+      const viewEspecial = document.getElementById("view-calc-especial");
+      const viewNormal = document.getElementById("view-calc-normal");
+      const pageTitle = document.getElementById("pageTitle");
+      const moduleTitle = document.getElementById("moduleTitle");
+      const moduleBadge = document.getElementById("moduleBadge");
+      const kpiState = document.getElementById("kpiState");
+
+      btnEspecial.classList.remove("active");
+      btnNormal.classList.remove("active");
+      viewEspecial.classList.add("hidden");
+      viewNormal.classList.add("hidden");
+
+      if (modulo === "especial") {
+        btnEspecial.classList.add("active");
+        viewEspecial.classList.remove("hidden");
+        pageTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
+        moduleTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
+        moduleBadge.textContent = "calculo_descuento_especial";
+        kpiState.textContent = "Activo";
+        kpiState.className = "text-2xl font-display font-bold text-tealx mt-1";
+      } else {
+        btnNormal.classList.add("active");
+        viewNormal.classList.remove("hidden");
+        pageTitle.textContent = "CÁLCULO DESCUENTO";
+        moduleTitle.textContent = "CÁLCULO DESCUENTO";
+        moduleBadge.textContent = "calculo_descuento";
+        kpiState.textContent = "Activo";
+        kpiState.className = "text-2xl font-display font-bold text-tealx mt-1";
+      }
+    }
+
+    document.getElementById("btnModuloCalculoEspecial").addEventListener("click", () => activarModulo("especial"));
+    document.getElementById("btnModuloCalculo").addEventListener("click", () => activarModulo("normal"));
+    document.getElementById("btnLogout").addEventListener("click", logout);
+    document.getElementById("btnLogin").addEventListener("click", login);
+
+    document.getElementById("loginPassword").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") login();
+    });
+
+    document.getElementById("loginUser").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") login();
+    });
+
+    if (isLoggedIn()) {
+      showPortal();
+    } else {
+      showLogin();
+    }
+
+    function fmt(n, dec = 2) {
+      return n.toLocaleString('es-EC', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+
+    function showWarn(msg) {
+      const b = document.getElementById('warning-box');
+      document.getElementById('warning-msg').textContent = msg;
+      b.classList.remove('hidden');
+      b.classList.add('flex');
+    }
+
+    function hideWarn() {
+      const b = document.getElementById('warning-box');
+      b.classList.add('hidden');
+      b.classList.remove('flex');
+    }
+
+    function selectIva(val) {
+      document.getElementById('iva').value = val;
+      document.getElementById('iva-btn-0').classList.toggle('active', val === 0);
+      document.getElementById('iva-btn-15').classList.toggle('active', val === 15);
+    }
+
+    function setColor(id, color) {
+      document.getElementById(id).style.color = color;
+    }
+
+    function calcular() {
+      hideWarn();
+
+      const ivaVal   = document.getElementById('iva').value;
+      const pvp      = parseFloat(document.getElementById('pvp').value);
+      const costo    = parseFloat(document.getElementById('costo').value);
+      const utilidad = parseFloat(document.getElementById('utilidad').value);
+
+      if (ivaVal === '') return showWarn('Por favor selecciona el % IVA (0% o 15%).');
+      if (isNaN(pvp) || isNaN(costo) || pvp <= 0 || costo <= 0) {
+        return showWarn('Ingresa valores válidos para PVP y Costo.');
+      }
+      if (isNaN(utilidad) || utilidad <= 0) {
+        return showWarn('Ingresa un valor válido para la Utilidad a Aplicar.');
+      }
+
+      const iva          = parseFloat(ivaVal) / 100;
+      const costoIVA     = costo + costo * iva;
+      const rentabilidad = (pvp - costoIVA) / pvp;
+      const pvpx         = costoIVA / (1 - utilidad / 100);
+      const valorDesc    = pvp - pvpx;
+      const descPct      = (valorDesc / pvp) - 0.0001;
+      const descRound    = Math.round(descPct * 10000) / 100;
+      const precioEsp    = pvp - pvp * (descRound / 100);
+      const utiFinal     = 1 - (costoIVA / precioEsp);
+
+      if (rentabilidad < utilidad / 100) {
+        showWarn(`Rentabilidad actual (${fmt(rentabilidad * 100, 2)}%) es menor a la utilidad solicitada (${fmt(utilidad, 2)}%). No es viable.`);
+      }
+
+      const rDesc = document.getElementById('r-desc-pct');
+      rDesc.textContent = `${fmt(descRound, 2)}%`;
+      rDesc.style.color = '#00c2ff';
+      document.getElementById('r-desc-sub').textContent = 'descuento a aplicar sobre PVP';
+
+      const rPrecio = document.getElementById('r-precio-esp');
+      rPrecio.textContent = `$${fmt(precioEsp)}`;
+      rPrecio.style.color = '#00ffc8';
+      document.getElementById('r-precio-sub').textContent = 'precio con descuento aplicado';
+
+      setColor('r-costo-iva', '#e8edf5');
+      document.getElementById('r-costo-iva').textContent = `$${fmt(costoIVA)}`;
+
+      setColor('r-rentabilidad', '#e8edf5');
+      document.getElementById('r-rentabilidad').textContent = `${fmt(rentabilidad * 100, 2)}%`;
+
+      setColor('r-valor-desc', '#e8edf5');
+      document.getElementById('r-valor-desc').textContent = `$${fmt(valorDesc)}`;
+
+      const cardUti = document.getElementById('card-uti');
+      const rUti    = document.getElementById('r-uti-final');
+      rUti.textContent = `${fmt(utiFinal * 100, 2)}%`;
+
+      if (utiFinal >= utilidad / 100 - 0.001) {
+        cardUti.style.borderColor = 'rgba(0,255,200,0.35)';
+        cardUti.style.background  = 'rgba(0,255,200,0.04)';
+        rUti.style.color = '#00ffc8';
+      } else {
+        cardUti.style.borderColor = 'rgba(255,78,106,0.35)';
+        cardUti.style.background  = 'rgba(255,78,106,0.04)';
+        rUti.style.color = '#ff4e6a';
+      }
+
+      const barPct  = Math.max(0, Math.min(100, rentabilidad * 100));
+      const barFill = document.getElementById('bar-fill');
+      barFill.style.width = barPct + '%';
+      barFill.style.background = rentabilidad >= utilidad / 100
+        ? 'linear-gradient(90deg,#00c2ff,#00ffc8)'
+        : 'linear-gradient(90deg,#ff4e6a,#ffb347)';
+      document.getElementById('bar-pct-txt').textContent = `${fmt(barPct, 2)}%`;
+
+      const hero = document.getElementById('hero-result');
+      hero.classList.remove('hero-pulse');
+      void hero.offsetWidth;
+      hero.classList.add('hero-pulse');
+    }
+
+    function resetear() {
+      ['pvp','costo','utilidad'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('iva').value = '';
+      document.getElementById('iva-btn-0').classList.remove('active');
+      document.getElementById('iva-btn-15').classList.remove('active');
+      hideWarn();
+
+      const muted = '#5a7090';
+      ['r-desc-pct','r-precio-esp','r-costo-iva','r-rentabilidad','r-valor-desc','r-uti-final'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(id).style.color = muted;
+      });
+
+      document.getElementById('r-desc-sub').textContent = 'ingresa los datos y calcula';
+      document.getElementById('r-precio-sub').textContent = '\u00a0';
+      document.getElementById('bar-fill').style.width = '0%';
+      document.getElementById('bar-pct-txt').textContent = '—';
+
+      const cardUti = document.getElementById('card-uti');
+      cardUti.style.borderColor = '#1e3050';
+      cardUti.style.background  = '#1a2236';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !document.getElementById('portalApp').classList.contains('hidden')) {
+        calcular();
+      }
+    });
+  </script>
+</body>
+</html>

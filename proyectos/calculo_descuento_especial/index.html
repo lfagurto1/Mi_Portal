@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cálculo Descuento Especial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cyan:  #00c2ff;
+      --teal:  #00ffc8;
+      --red:   #ff4e6a;
+      --amber: #ffb347;
+      --bg:    #0b0f1a;
+      --s800:  #0d1525;
+      --s700:  #131929;
+      --s600:  #1a2236;
+      --s500:  #1e3050;
+      --text:  #e8edf5;
+      --muted: #5a7090;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,194,255,0.07), transparent),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,80,0.25) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,80,0.12) 40px);
+    }
+    .font-display { font-family: 'Rajdhani', sans-serif; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .header-glow::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--teal), transparent);
+    }
+    .panel-glow::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,194,255,0.25), transparent);
+    }
+    .hero-top::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--cyan), var(--teal));
+    }
+
+    .custom-input {
+      width: 100%;
+      background: var(--s800);
+      border: 1px solid var(--s500);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      padding: 11px 48px 11px 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .custom-input::placeholder { color: var(--muted); }
+    .custom-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,194,255,0.1);
+    }
+
+    /* IVA toggle buttons */
+    .iva-btn {
+      flex: 1;
+      background: var(--s800);
+      border: 1px solid var(--s500);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      padding: 11px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .iva-btn:hover { border-color: var(--cyan); color: var(--text); }
+    .iva-btn.active {
+      background: rgba(0,194,255,0.1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(0,194,255,0.15);
+    }
+
+    @keyframes pulse-glow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,194,255,0); }
+      50%      { box-shadow: 0 0 20px 4px rgba(0,194,255,0.22); }
+    }
+    .hero-pulse { animation: pulse-glow 0.9s ease; }
+    .bar-fill { transition: width 0.5s cubic-bezier(0.25,0.8,0.25,1), background 0.5s; }
+  </style>
+</head>
+
+<body class="pb-16">
+
+  <!-- ── HEADER ── -->
+  <header class="relative bg-gradient-to-br from-[#0d1a2e] to-[#0b1520] border-b border-[#1e3050] header-glow overflow-hidden">
+    <div class="absolute top-[-60px] right-[-60px] w-48 h-48 rounded-full"
+         style="background: radial-gradient(circle, rgba(0,194,255,0.06) 0%, transparent 70%)"></div>
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-8 py-5 flex items-center gap-4">
+      <div class="relative shrink-0 w-11 h-11 border border-[#00c2ff] rounded-lg flex items-center justify-center">
+        <span class="font-display text-lg font-bold text-[#00c2ff] relative z-10">%</span>
+        <div class="absolute inset-[3px] rounded-md" style="background:rgba(0,194,255,0.07)"></div>
+      </div>
+      <div>
+        <h1 class="font-display text-lg sm:text-2xl font-bold tracking-[0.18em] uppercase text-slate-100">
+          <span class="text-[#00c2ff]">CÁLCULO</span> DESCUENTO ESPECIAL
+        </h1>
+        <p class="text-[10px] tracking-[0.18em] uppercase text-[#5a7090] mt-0.5">
+          Herramienta de margen y precio especial
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-8 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+      <!-- ── INPUTS ── -->
+      <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-6 panel-glow overflow-hidden">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Datos del producto</span>
+          <span class="flex-1 h-px bg-[#1e3050]"></span>
+        </div>
+
+        <div class="flex flex-col gap-5">
+
+          <!-- % IVA toggle -->
+          <div>
+            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-2">% IVA</label>
+            <div class="flex gap-3">
+              <button type="button" class="iva-btn" id="iva-btn-0"  onclick="selectIva(0)">0%</button>
+              <button type="button" class="iva-btn" id="iva-btn-15" onclick="selectIva(15)">15%</button>
+            </div>
+            <input type="hidden" id="iva" value="" />
+          </div>
+
+          <!-- PVP + IVA -->
+          <div>
+            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+              PVP + IVA — Precio de Venta al Público + IVA
+            </label>
+            <div class="relative">
+              <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+              <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
+            </div>
+          </div>
+
+          <!-- COSTO SIN IVA -->
+          <div>
+            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+              COSTO SIN IVA
+            </label>
+            <div class="relative">
+              <input id="costo" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+              <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
+            </div>
+          </div>
+
+          <!-- UTILIDAD A APLICAR -->
+          <div>
+            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+              UTILIDAD A APLICAR
+            </label>
+            <div class="relative">
+              <input id="utilidad" type="number" placeholder="0.00" step="0.1" min="0" max="99" class="custom-input" />
+              <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <button onclick="calcular()"
+          class="font-display mt-6 w-full py-3.5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-[#0b0f1a] hover:opacity-90 active:scale-[0.99] transition-all"
+          style="background: linear-gradient(135deg, #00c2ff, #00ffc8)">
+          CALCULAR
+        </button>
+        <button onclick="resetear()"
+          class="mt-2.5 w-full py-2 rounded-lg border border-[#1e3050] text-[#5a7090] text-xs hover:text-slate-300 hover:border-[#5a7090] transition-all">
+          ↺ Limpiar
+        </button>
+      </div>
+
+      <!-- ── RESULTS ── -->
+      <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-6 panel-glow overflow-hidden flex flex-col gap-4">
+        <div class="flex items-center gap-3">
+          <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Resultados</span>
+          <span class="flex-1 h-px bg-[#1e3050]"></span>
+        </div>
+
+        <!-- Warning -->
+        <div id="warning-box" class="hidden flex-row items-start gap-3 rounded-xl px-4 py-3 text-sm"
+             style="background:rgba(255,78,106,0.08); border:1px solid rgba(255,78,106,0.3); color:#ff4e6a;">
+          <span class="shrink-0 mt-0.5">⚠</span>
+          <span id="warning-msg"></span>
+        </div>
+
+        <!-- Hero: DESC + PRECIO -->
+        <div id="hero-result"
+             class="relative hero-top overflow-hidden rounded-xl px-5 py-5"
+             style="background:linear-gradient(135deg,rgba(0,194,255,0.07) 0%,rgba(0,255,200,0.04) 100%); border:1px solid rgba(0,194,255,0.28);">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <p class="text-[9px] tracking-[0.2em] uppercase text-[#5a7090] mb-1">Descuento Porcentual (DESC. NUEVO)</p>
+              <p id="r-desc-pct" class="font-display text-5xl font-bold leading-none text-[#5a7090] transition-all">—</p>
+              <p id="r-desc-sub" class="text-[10px] text-[#5a7090] mt-2">ingresa los datos y calcula</p>
+            </div>
+            <div class="sm:text-right">
+              <p class="text-[9px] tracking-[0.2em] uppercase text-[#5a7090] mb-1">Precio Especial + IVA</p>
+              <p id="r-precio-esp" class="font-display text-4xl font-bold leading-none text-[#5a7090] transition-all">—</p>
+              <p id="r-precio-sub" class="text-[10px] text-[#5a7090] mt-2">&nbsp;</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Costo + IVA</p>
+            <p id="r-costo-iva" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+          </div>
+          <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Rentabilidad Porcentual</p>
+            <p id="r-rentabilidad" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+          </div>
+        </div>
+
+        <!-- Bar -->
+        <div class="rounded-xl px-4 py-3.5" style="background:#1a2236; border:1px solid #1e3050;">
+          <div class="flex justify-between items-center mb-2.5">
+            <span class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090]">Margen actual sobre PVP</span>
+            <span id="bar-pct-txt" class="font-display text-sm font-semibold text-slate-400">—</span>
+          </div>
+          <div class="h-1.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,0.05);">
+            <div id="bar-fill" class="bar-fill h-full rounded-full w-0"
+                 style="background:linear-gradient(90deg,#00c2ff,#00ffc8)"></div>
+          </div>
+        </div>
+
+        <!-- % Uti Final + Valor Desc -->
+        <div class="grid grid-cols-2 gap-3">
+          <div id="card-uti" class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">% Utilidad Final</p>
+            <p id="r-uti-final" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+          </div>
+          <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] tracking-[0.13em] uppercase text-[#5a7090] mb-1.5">Valor Descuento ($)</p>
+            <p id="r-valor-desc" class="font-display text-xl font-bold text-[#5a7090] transition-all">—</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <p class="text-center text-[10px] tracking-widest uppercase text-[#5a7090] mt-8 opacity-50">
+      Presiona Enter para calcular rápidamente
+    </p>
+  </main>
+
+  <script>
+    function fmt(n, dec = 2) {
+      return n.toLocaleString('es-EC', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    }
+    function showWarn(msg) {
+      const b = document.getElementById('warning-box');
+      document.getElementById('warning-msg').textContent = msg;
+      b.classList.remove('hidden'); b.classList.add('flex');
+    }
+    function hideWarn() {
+      const b = document.getElementById('warning-box');
+      b.classList.add('hidden'); b.classList.remove('flex');
+    }
+
+    function selectIva(val) {
+      document.getElementById('iva').value = val;
+      document.getElementById('iva-btn-0').classList.toggle('active',  val === 0);
+      document.getElementById('iva-btn-15').classList.toggle('active', val === 15);
+    }
+
+    function setColor(id, color) {
+      document.getElementById(id).style.color = color;
+    }
+
+    function calcular() {
+      hideWarn();
+      const ivaVal   = document.getElementById('iva').value;
+      const pvp      = parseFloat(document.getElementById('pvp').value);
+      const costo    = parseFloat(document.getElementById('costo').value);
+      const utilidad = parseFloat(document.getElementById('utilidad').value);
+
+      if (ivaVal === '') return showWarn('Por favor selecciona el % IVA (0% o 15%).');
+      if (isNaN(pvp) || isNaN(costo) || pvp <= 0 || costo <= 0)
+        return showWarn('Ingresa valores válidos para PVP y Costo.');
+      if (isNaN(utilidad) || utilidad <= 0)
+        return showWarn('Ingresa un valor válido para la Utilidad a Aplicar.');
+
+      const iva          = parseFloat(ivaVal) / 100;
+      const costoIVA     = costo + costo * iva;
+      const rentabilidad = (pvp - costoIVA) / pvp;
+      const pvpx         = costoIVA / (1 - utilidad / 100);
+      const valorDesc    = pvp - pvpx;
+      const descPct      = (valorDesc / pvp) - 0.0001;
+      const descRound    = Math.round(descPct * 10000) / 100;
+      const precioEsp    = pvp - pvp * (descRound / 100);
+      const utiFinal     = 1 - (costoIVA / precioEsp);
+
+      if (rentabilidad < utilidad / 100) {
+        showWarn(`Rentabilidad actual (${fmt(rentabilidad * 100, 2)}%) es menor a la utilidad solicitada (${fmt(utilidad, 2)}%). No es viable.`);
+      }
+
+      // Hero
+      const rDesc = document.getElementById('r-desc-pct');
+      rDesc.textContent = `${fmt(descRound, 2)}%`;
+      rDesc.style.color = '#00c2ff';
+      document.getElementById('r-desc-sub').textContent = 'descuento a aplicar sobre PVP';
+
+      const rPrecio = document.getElementById('r-precio-esp');
+      rPrecio.textContent = `$${fmt(precioEsp)}`;
+      rPrecio.style.color = '#00ffc8';
+      document.getElementById('r-precio-sub').textContent = 'precio con descuento aplicado';
+
+      // Secondary
+      setColor('r-costo-iva', '#e8edf5');
+      document.getElementById('r-costo-iva').textContent = `$${fmt(costoIVA)}`;
+
+      setColor('r-rentabilidad', '#e8edf5');
+      document.getElementById('r-rentabilidad').textContent = `${fmt(rentabilidad * 100, 2)}%`;
+
+      setColor('r-valor-desc', '#e8edf5');
+      document.getElementById('r-valor-desc').textContent = `$${fmt(valorDesc)}`;
+
+      // Utilidad final color
+      const cardUti = document.getElementById('card-uti');
+      const rUti    = document.getElementById('r-uti-final');
+      rUti.textContent = `${fmt(utiFinal * 100, 2)}%`;
+      if (utiFinal >= utilidad / 100 - 0.001) {
+        cardUti.style.borderColor = 'rgba(0,255,200,0.35)';
+        cardUti.style.background  = 'rgba(0,255,200,0.04)';
+        rUti.style.color = '#00ffc8';
+      } else {
+        cardUti.style.borderColor = 'rgba(255,78,106,0.35)';
+        cardUti.style.background  = 'rgba(255,78,106,0.04)';
+        rUti.style.color = '#ff4e6a';
+      }
+
+      // Bar
+      const barPct  = Math.max(0, Math.min(100, rentabilidad * 100));
+      const barFill = document.getElementById('bar-fill');
+      barFill.style.width = barPct + '%';
+      barFill.style.background = rentabilidad >= utilidad / 100
+        ? 'linear-gradient(90deg,#00c2ff,#00ffc8)'
+        : 'linear-gradient(90deg,#ff4e6a,#ffb347)';
+      document.getElementById('bar-pct-txt').textContent = `${fmt(barPct, 2)}%`;
+
+      // Pulse
+      const hero = document.getElementById('hero-result');
+      hero.classList.remove('hero-pulse');
+      void hero.offsetWidth;
+      hero.classList.add('hero-pulse');
+    }
+
+    function resetear() {
+      ['pvp','costo','utilidad'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('iva').value = '';
+      document.getElementById('iva-btn-0').classList.remove('active');
+      document.getElementById('iva-btn-15').classList.remove('active');
+      hideWarn();
+
+      const muted = '#5a7090';
+      ['r-desc-pct','r-precio-esp','r-costo-iva','r-rentabilidad','r-valor-desc','r-uti-final'].forEach(id => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(id).style.color = muted;
+      });
+      document.getElementById('r-desc-sub').textContent = 'ingresa los datos y calcula';
+      document.getElementById('r-precio-sub').textContent = '\u00a0';
+      document.getElementById('bar-fill').style.width = '0%';
+      document.getElementById('bar-pct-txt').textContent = '—';
+
+      const cardUti = document.getElementById('card-uti');
+      cardUti.style.borderColor = '#1e3050';
+      cardUti.style.background  = '#1a2236';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+  </script>
+</body>
+</html>
