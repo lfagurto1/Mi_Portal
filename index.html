@@ -28,9 +28,6 @@
           },
           borderRadius: {
             xl2: '1.25rem'
-          },
-          backdropBlur: {
-            xs: '2px'
           }
         }
       }
@@ -301,31 +298,35 @@
 
     <!-- MAIN -->
     <main class="min-w-0 lg:h-screen lg:overflow-hidden flex flex-col">
-      <header class="border-b border-cyanx/10 bg-darkpanel/80 backdrop-blur-sm px-5 sm:px-6 py-4">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
+      <header class="border-b border-cyanx/10 bg-darkpanel/80 backdrop-blur-sm px-5 sm:px-6 py-3">
+        <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+          <div class="min-w-0">
             <h2 id="pageTitle" class="text-2xl sm:text-3xl font-display font-bold text-white leading-none">
               CÁLCULO DESCUENTO ESPECIAL
             </h2>
           </div>
 
-          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4 w-full lg:w-auto lg:min-w-[360px]">
-            <div class="flex items-center justify-between gap-3 mb-3">
-              <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                Activa
-              </span>
-            </div>
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 w-full xl:w-auto xl:min-w-[520px]">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  Activa
+                </span>
+              </div>
 
-            <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-3">
-              <p class="text-xs uppercase tracking-[0.18em] text-mutedx">Usuario</p>
-              <p id="activeUsernameHeader" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
-            </div>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-2 min-w-[180px]">
+                  <p class="text-[10px] uppercase tracking-[0.18em] text-mutedx">Usuario</p>
+                  <p id="activeUsernameHeader" class="text-base font-display font-bold text-white mt-0.5">lfagurto</p>
+                </div>
 
-            <button id="btnLogoutHeader" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
-              Cerrar sesión
-            </button>
+                <button id="btnLogoutHeader" class="rounded-xl bg-tomato px-5 py-3 text-white font-semibold hover:opacity-95 whitespace-nowrap">
+                  Cerrar sesión
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -391,7 +392,7 @@
                           PVP + IVA — Precio de Venta al Público + IVA
                         </label>
                         <div class="relative">
-                          <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+                          <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input calc-field" />
                           <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
                         </div>
                       </div>
@@ -401,7 +402,7 @@
                           COSTO SIN IVA
                         </label>
                         <div class="relative">
-                          <input id="costo" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+                          <input id="costo" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input calc-field" />
                           <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
                         </div>
                       </div>
@@ -411,7 +412,7 @@
                           UTILIDAD A APLICAR
                         </label>
                         <div class="relative">
-                          <input id="utilidad" type="number" placeholder="0.00" step="0.1" min="0" max="99" class="custom-input" />
+                          <input id="utilidad" type="number" placeholder="0.00" step="0.1" min="0" max="99" class="custom-input calc-field" />
                           <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">%</span>
                         </div>
                       </div>
@@ -527,6 +528,7 @@
       document.getElementById("portalApp").classList.remove("hidden");
       const savedUser = sessionStorage.getItem(LOGIN_USER_KEY) || LOGIN_USER;
       document.getElementById("activeUsernameHeader").textContent = savedUser;
+      hideWarn();
     }
 
     function showLogin() {
@@ -611,11 +613,13 @@
         viewEspecial.classList.remove("hidden");
         pageTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
         moduleTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
+        hideWarn();
       } else {
         btnNormal.classList.add("active");
         viewNormal.classList.remove("hidden");
         pageTitle.textContent = "CÁLCULO DESCUENTO";
         moduleTitle.textContent = "CÁLCULO DESCUENTO";
+        hideWarn();
       }
     }
 
@@ -673,6 +677,17 @@
       const costo    = parseFloat(document.getElementById('costo').value);
       const utilidad = parseFloat(document.getElementById('utilidad').value);
 
+      const hasValues =
+        ivaVal !== '' ||
+        document.getElementById('pvp').value.trim() !== '' ||
+        document.getElementById('costo').value.trim() !== '' ||
+        document.getElementById('utilidad').value.trim() !== '';
+
+      if (!hasValues) {
+        hideWarn();
+        return;
+      }
+
       if (ivaVal === '') return showWarn('Por favor selecciona el % IVA (0% o 15%).');
       if (isNaN(pvp) || isNaN(costo) || pvp <= 0 || costo <= 0) {
         return showWarn('Ingresa valores válidos para PVP y Costo.');
@@ -693,6 +708,8 @@
 
       if (rentabilidad < utilidad / 100) {
         showWarn(`Rentabilidad actual (${fmt(rentabilidad * 100, 2)}%) es menor a la utilidad solicitada (${fmt(utilidad, 2)}%). No es viable.`);
+      } else {
+        hideWarn();
       }
 
       const rDesc = document.getElementById('r-desc-pct');
@@ -765,10 +782,12 @@
       cardUti.style.background  = '#1a2236';
     }
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !document.getElementById('portalApp').classList.contains('hidden')) {
-        calcular();
-      }
+    document.querySelectorAll('.calc-field').forEach((input) => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          calcular();
+        }
+      });
     });
   </script>
 </body>
