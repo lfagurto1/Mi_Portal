@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cálculo Descuento Especial</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -33,8 +35,8 @@
     }
     .font-display { font-family: 'Rajdhani', sans-serif; }
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
     .header-glow::before {
       content: '';
@@ -62,7 +64,7 @@
       border-radius: 10px;
       color: var(--text);
       font-family: 'Rajdhani', sans-serif;
-      font-size: 1.4rem;
+      font-size: clamp(1rem, 3.5vw, 1.4rem);
       font-weight: 500;
       padding: 11px 48px 11px 15px;
       outline: none;
@@ -82,7 +84,7 @@
       border-radius: 10px;
       color: var(--muted);
       font-family: 'Rajdhani', sans-serif;
-      font-size: 1.3rem;
+      font-size: clamp(0.95rem, 3vw, 1.3rem);
       font-weight: 600;
       padding: 11px 0;
       cursor: pointer;
@@ -203,13 +205,6 @@
           <span class="flex-1 h-px bg-[#1e3050]"></span>
         </div>
 
-        <!-- Warning -->
-        <div id="warning-box" class="hidden flex-row items-start gap-3 rounded-xl px-4 py-3 text-sm"
-             style="background:rgba(255,78,106,0.08); border:1px solid rgba(255,78,106,0.3); color:#ff4e6a;">
-          <span class="shrink-0 mt-0.5">⚠</span>
-          <span id="warning-msg"></span>
-        </div>
-
         <!-- Hero: DESC + PRECIO -->
         <div id="hero-result"
              class="relative hero-top overflow-hidden rounded-xl px-5 py-5"
@@ -276,15 +271,23 @@
     function fmt(n, dec = 2) {
       return n.toLocaleString('es-EC', { minimumFractionDigits: dec, maximumFractionDigits: dec });
     }
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 4000,
+      timerProgressBar: true,
+      background: '#131929',
+      color: '#e8edf5',
+      didOpen: t => {
+        t.addEventListener('mouseenter', Swal.stopTimer);
+        t.addEventListener('mouseleave', Swal.resumeTimer);
+      }
+    });
     function showWarn(msg) {
-      const b = document.getElementById('warning-box');
-      document.getElementById('warning-msg').textContent = msg;
-      b.classList.remove('hidden'); b.classList.add('flex');
+      Toast.fire({ icon: 'warning', title: msg, iconColor: '#ff4e6a' });
     }
-    function hideWarn() {
-      const b = document.getElementById('warning-box');
-      b.classList.add('hidden'); b.classList.remove('flex');
-    }
+    function hideWarn() {}
 
     function selectIva(val) {
       document.getElementById('iva').value = val;
@@ -320,7 +323,7 @@
       const utiFinal     = 1 - (costoIVA / precioEsp);
 
       if (rentabilidad < utilidad / 100) {
-        showWarn(`Rentabilidad actual (${fmt(rentabilidad * 100, 2)}%) es menor a la utilidad solicitada (${fmt(utilidad, 2)}%). No es viable.`);
+        Toast.fire({ icon: 'error', title: `Rentabilidad actual (${fmt(rentabilidad * 100, 2)}%) es menor a la utilidad solicitada (${fmt(utilidad, 2)}%). No es viable.`, iconColor: '#ff4e6a' });
       }
 
       // Hero
