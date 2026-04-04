@@ -234,10 +234,6 @@
           Ingresar
         </button>
       </div>
-
-      <div class="mt-6 text-center text-sm text-white/65">
-        Usuario: <span class="font-semibold text-white">lfagurto</span> · Contraseña: <span class="font-semibold text-white">170290</span>
-      </div>
     </div>
   </section>
 
@@ -273,10 +269,10 @@
 
             <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-3">
               <p class="text-xs uppercase tracking-[0.18em] text-mutedx">Usuario</p>
-              <p id="activeUsername" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
+              <p id="activeUsernameSidebar" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
             </div>
 
-            <button id="btnLogout" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
+            <button id="btnLogoutSidebar" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
               Cerrar sesión
             </button>
           </div>
@@ -325,31 +321,30 @@
     <!-- MAIN -->
     <main class="min-w-0 lg:h-screen lg:overflow-hidden flex flex-col">
       <header class="border-b border-cyanx/10 bg-darkpanel/80 backdrop-blur-sm px-5 sm:px-6 py-4">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Proyecto activo</p>
-            <h2 id="pageTitle" class="text-2xl sm:text-3xl font-display font-bold text-white leading-none mt-1">
+            <h2 id="pageTitle" class="text-2xl sm:text-3xl font-display font-bold text-white leading-none">
               CÁLCULO DESCUENTO ESPECIAL
             </h2>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
-              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Módulos</p>
-              <p id="kpiModules" class="text-2xl font-display font-bold text-white mt-1">2</p>
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4 w-full lg:w-auto lg:min-w-[320px]">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                Activa
+              </span>
             </div>
-            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
-              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Estado</p>
-              <p id="kpiState" class="text-2xl font-display font-bold text-tealx mt-1">Activo</p>
+
+            <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-3">
+              <p class="text-xs uppercase tracking-[0.18em] text-mutedx">Usuario</p>
+              <p id="activeUsernameHeader" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
             </div>
-            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
-              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Tipo</p>
-              <p id="kpiType" class="text-2xl font-display font-bold text-white mt-1">Utilitario</p>
-            </div>
-            <div class="rounded-2xl bg-darkcard border border-cyanx/10 px-4 py-3 min-w-[120px]">
-              <p class="text-xs text-mutedx uppercase tracking-[0.18em]">Vista</p>
-              <p id="kpiView" class="text-2xl font-display font-bold text-cyanx mt-1">Interna</p>
-            </div>
+
+            <button id="btnLogoutHeader" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
+              Cerrar sesión
+            </button>
           </div>
         </div>
       </header>
@@ -357,14 +352,10 @@
       <section class="content-scroll flex-1 overflow-y-auto p-4 sm:p-6 grid-bg">
         <div class="rounded-[1.5rem] bg-darkpanel/80 border border-cyanx/10 shadow-soft overflow-hidden">
           <div class="px-5 py-4 border-b border-cyanx/10 bg-darkcard/80">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Módulo activo</p>
-                <h3 id="moduleTitle" class="text-xl font-display font-bold text-white mt-1">CÁLCULO DESCUENTO ESPECIAL</h3>
-              </div>
-              <span id="moduleBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyanx/10 text-cyanx text-xs font-semibold">
-                calculo_descuento_especial
-              </span>
+            <div>
+              <h3 id="moduleTitle" class="text-xl font-display font-bold text-white">
+                CÁLCULO DESCUENTO ESPECIAL
+              </h3>
             </div>
           </div>
 
@@ -529,15 +520,15 @@
           </div>
 
           <!-- MODULO 2 -->
-<div id="view-calc-normal" class="p-4 sm:p-6 hidden">
-  <div class="rounded-[1.5rem] border border-cyanx/10 bg-darkbg overflow-hidden">
-    <iframe
-      id="frameCalcNormal"
-      class="w-full h-[78vh] border-0 bg-white"
-      title="CÁLCULO DESCUENTO">
-    </iframe>
-  </div>
-</div>
+          <div id="view-calc-normal" class="p-4 sm:p-6 hidden">
+            <div class="rounded-[1.5rem] border border-cyanx/10 bg-darkbg overflow-hidden">
+              <iframe
+                id="frameCalcNormal"
+                class="w-full h-[78vh] border-0 bg-white"
+                title="CÁLCULO DESCUENTO">
+              </iframe>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -554,7 +545,8 @@
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("portalApp").classList.remove("hidden");
       const savedUser = sessionStorage.getItem(LOGIN_USER_KEY) || LOGIN_USER;
-      document.getElementById("activeUsername").textContent = savedUser;
+      document.getElementById("activeUsernameSidebar").textContent = savedUser;
+      document.getElementById("activeUsernameHeader").textContent = savedUser;
     }
 
     function showLogin() {
@@ -615,16 +607,11 @@
       sessionStorage.removeItem(LOGIN_USER_KEY);
       showLogin();
     }
-    const frameCalcNormal = document.getElementById("frameCalcNormal");
-if (frameCalcNormal) {
-  const currentPath = window.location.pathname.toLowerCase();
 
-  if (currentPath.includes("/proyectos/")) {
-    frameCalcNormal.src = "./calculo_descuento/index.html";
-  } else {
-    frameCalcNormal.src = "./proyectos/calculo_descuento/index.html";
-  }
-}
+    const frameCalcNormal = document.getElementById("frameCalcNormal");
+    if (frameCalcNormal) {
+      frameCalcNormal.src = "./proyectos/calculo_descuento/index.html";
+    }
 
     function activarModulo(modulo) {
       const btnEspecial = document.getElementById("btnModuloCalculoEspecial");
@@ -633,8 +620,6 @@ if (frameCalcNormal) {
       const viewNormal = document.getElementById("view-calc-normal");
       const pageTitle = document.getElementById("pageTitle");
       const moduleTitle = document.getElementById("moduleTitle");
-      const moduleBadge = document.getElementById("moduleBadge");
-      const kpiState = document.getElementById("kpiState");
 
       btnEspecial.classList.remove("active");
       btnNormal.classList.remove("active");
@@ -646,23 +631,18 @@ if (frameCalcNormal) {
         viewEspecial.classList.remove("hidden");
         pageTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
         moduleTitle.textContent = "CÁLCULO DESCUENTO ESPECIAL";
-        moduleBadge.textContent = "calculo_descuento_especial";
-        kpiState.textContent = "Activo";
-        kpiState.className = "text-2xl font-display font-bold text-tealx mt-1";
       } else {
         btnNormal.classList.add("active");
         viewNormal.classList.remove("hidden");
         pageTitle.textContent = "CÁLCULO DESCUENTO";
         moduleTitle.textContent = "CÁLCULO DESCUENTO";
-        moduleBadge.textContent = "calculo_descuento";
-        kpiState.textContent = "Activo";
-        kpiState.className = "text-2xl font-display font-bold text-tealx mt-1";
       }
     }
 
     document.getElementById("btnModuloCalculoEspecial").addEventListener("click", () => activarModulo("especial"));
     document.getElementById("btnModuloCalculo").addEventListener("click", () => activarModulo("normal"));
-    document.getElementById("btnLogout").addEventListener("click", logout);
+    document.getElementById("btnLogoutSidebar").addEventListener("click", logout);
+    document.getElementById("btnLogoutHeader").addEventListener("click", logout);
     document.getElementById("btnLogin").addEventListener("click", login);
 
     document.getElementById("loginPassword").addEventListener("keydown", (e) => {
