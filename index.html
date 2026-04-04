@@ -260,25 +260,6 @@
         <div class="sidebar-scroll flex-1 overflow-y-auto px-4 py-4 space-y-4">
           <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4">
             <div class="flex items-center justify-between gap-3 mb-3">
-              <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
-              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
-                <span id="sessionDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <span id="sessionLabel">Activa</span>
-              </span>
-            </div>
-
-            <div class="rounded-xl border border-cyanx/10 bg-darkbg px-4 py-3">
-              <p class="text-xs uppercase tracking-[0.18em] text-mutedx">Usuario</p>
-              <p id="activeUsernameSidebar" class="text-lg font-display font-bold text-white mt-1">lfagurto</p>
-            </div>
-
-            <button id="btnLogoutSidebar" class="mt-3 w-full rounded-xl bg-tomato px-4 py-3 text-white font-semibold hover:opacity-95">
-              Cerrar sesión
-            </button>
-          </div>
-
-          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4">
-            <div class="flex items-center justify-between gap-3 mb-3">
               <h2 class="text-sm uppercase tracking-[0.20em] text-mutedx font-semibold">Módulos</h2>
               <span class="text-xs text-cyanx font-semibold">2</span>
             </div>
@@ -328,7 +309,7 @@
             </h2>
           </div>
 
-          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4 w-full lg:w-auto lg:min-w-[320px]">
+          <div class="rounded-2xl bg-darkcard border border-cyanx/10 p-4 w-full lg:w-auto lg:min-w-[360px]">
             <div class="flex items-center justify-between gap-3 mb-3">
               <span class="text-xs uppercase tracking-[0.22em] text-mutedx font-semibold">Sesión</span>
               <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-steel/10 text-steel text-xs font-semibold">
@@ -545,7 +526,6 @@
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("portalApp").classList.remove("hidden");
       const savedUser = sessionStorage.getItem(LOGIN_USER_KEY) || LOGIN_USER;
-      document.getElementById("activeUsernameSidebar").textContent = savedUser;
       document.getElementById("activeUsernameHeader").textContent = savedUser;
     }
 
@@ -641,7 +621,6 @@
 
     document.getElementById("btnModuloCalculoEspecial").addEventListener("click", () => activarModulo("especial"));
     document.getElementById("btnModuloCalculo").addEventListener("click", () => activarModulo("normal"));
-    document.getElementById("btnLogoutSidebar").addEventListener("click", logout);
     document.getElementById("btnLogoutHeader").addEventListener("click", logout);
     document.getElementById("btnLogin").addEventListener("click", login);
 
