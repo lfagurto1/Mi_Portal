@@ -4,12 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minuta Proveedores y Productos</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -21,82 +24,201 @@
           },
           fontFamily: {
             sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(15, 23, 42, 0.08)'
           }
         }
       }
     };
   </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .swal2-popup {
+      border-radius: 1.25rem !important;
+    }
+
+    .swal2-title {
+      font-size: 1.1rem !important;
+    }
+
+    .swal2-html-container,
+    .swal2-text {
+      font-size: 0.95rem !important;
+    }
+
+    .swal2-confirm,
+    .swal2-cancel {
+      border-radius: 0.9rem !important;
+      font-weight: 700 !important;
+      padding: 0.7rem 1rem !important;
+    }
+
+    .table-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #94a3b8 #e2e8f0;
+    }
+
+    .table-scroll::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+
+    .table-scroll::-webkit-scrollbar-track {
+      background: #e2e8f0;
+      border-radius: 999px;
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 999px;
+    }
+  </style>
 </head>
 <body class="bg-steel font-sans text-slate-800 min-h-screen">
   <div class="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 md:p-6 mb-6">
+    <div class="bg-white rounded-3xl shadow-soft border border-slate-200 p-5 md:p-6 mb-6">
       <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-violet drop-shadow-sm">Minuta Proveedores y Productos</h1>
-          <p class="text-slate-600 mt-1 text-sm md:text-base">Registro, seguimiento, carga y descarga de acuerdos de la reunión mensual del equipo.</p>
+        <div class="min-w-0">
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-violet">Minuta Proveedores y Productos</h1>
+          <p class="text-slate-600 mt-1 text-sm md:text-base">
+            Registro, seguimiento, carga y descarga de acuerdos de la reunión mensual del equipo.
+          </p>
         </div>
-        <div class="flex flex-wrap gap-2">
-          <button id="btnDescargarPlantilla" class="px-4 py-2 rounded-2xl bg-slate-700 text-white font-semibold hover:opacity-90 transition">Descargar plantilla</button>
-          <label for="inputImportarExcel" class="px-4 py-2 rounded-2xl bg-slate-600 text-white font-semibold hover:opacity-90 transition cursor-pointer">Cargar minuta</label>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:flex xl:flex-wrap gap-2 w-full xl:w-auto">
+          <button id="btnDescargarPlantilla" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl bg-slate-700 text-white font-semibold hover:opacity-90 transition">
+            Descargar plantilla
+          </button>
+
+          <label for="inputImportarExcel" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl bg-slate-600 text-white font-semibold hover:opacity-90 transition cursor-pointer text-center">
+            Cargar minuta
+          </label>
           <input id="inputImportarExcel" type="file" accept=".xlsx,.xls" class="hidden" />
-          <button id="btnExportarResumen" class="px-4 py-2 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">Exportar resumen</button>
-          <button id="btnExportarDetalle" class="px-4 py-2 rounded-2xl bg-tomato text-white font-semibold hover:opacity-90 transition">Descargar minuta</button>
-          <button id="btnEnviarCorreo" class="px-4 py-2 rounded-2xl bg-emerald-600 text-white font-semibold hover:opacity-90 transition">Preparar correo</button>
-          <button id="btnCerrarSesionAdmin" class="px-4 py-2 rounded-2xl border border-violet text-violet bg-white font-semibold hover:bg-violet/5 transition">Cerrar sesión admin</button>
-          <button id="btnLimpiarTodo" class="px-4 py-2 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition">Limpiar todo</button>
+
+          <button id="btnExportarResumen" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">
+            Exportar resumen
+          </button>
+
+          <button id="btnExportarDetalle" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl bg-tomato text-white font-semibold hover:opacity-90 transition">
+            Descargar minuta
+          </button>
+
+          <button id="btnEnviarCorreo" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl bg-emerald-600 text-white font-semibold hover:opacity-90 transition">
+            Preparar correo
+          </button>
+
+          <button id="btnCerrarSesionAdmin" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl border border-violet text-violet bg-white font-semibold hover:bg-violet/5 transition">
+            Cerrar sesión admin
+          </button>
+
+          <button id="btnLimpiarTodo" class="w-full xl:w-auto px-4 py-2.5 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition">
+            Limpiar todo
+          </button>
         </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <p class="text-sm font-medium text-slate-500">Total acuerdos</p>
         <p id="kpiTotal" class="text-3xl font-extrabold mt-1 text-violet">0</p>
       </div>
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <p class="text-sm font-medium text-slate-500">Pendientes</p>
         <p id="kpiPendiente" class="text-3xl font-extrabold mt-1 text-violet">0</p>
       </div>
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <p class="text-sm font-medium text-slate-500">Cumplidos</p>
         <p id="kpiCumplido" class="text-3xl font-extrabold mt-1 text-violet">0</p>
       </div>
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <p class="text-sm font-medium text-slate-500">Vencidos</p>
         <p id="kpiVencido" class="text-3xl font-extrabold mt-1 text-violet">0</p>
       </div>
     </div>
 
     <div class="space-y-6">
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <h2 class="text-xl font-extrabold tracking-tight mb-4 text-violet">Datos de la reunión</h2>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
           <div>
             <label class="block text-sm font-semibold mb-1">Fecha de reunión</label>
-            <input id="fechaReunion" type="date" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
+            <input
+              id="fechaReunion"
+              type="date"
+              class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3"
+            />
           </div>
+
           <div>
             <label class="block text-sm font-semibold mb-1">Tema de la reunión</label>
-            <input id="temaReunion" type="text" value="Indicadores Proveedores y Productos" readonly class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3" />
+            <input
+              id="temaReunion"
+              type="text"
+              value="Indicadores Proveedores y Productos"
+              readonly
+              class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3"
+            />
           </div>
+
           <div class="xl:col-span-2">
             <label class="block text-sm font-semibold mb-1">Objetivo</label>
-            <textarea id="objetivoReunion" rows="3" readonly class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3">Revisar y analizar los indicadores de desempeño y las actividades ejecutadas durante el mes, con el fin de evaluar los resultados obtenidos y definir acciones de mejora que optimicen el desempeño del siguiente mes.</textarea>
+            <textarea
+              id="objetivoReunion"
+              rows="3"
+              readonly
+              class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3"
+            >Revisar y analizar los indicadores de desempeño y las actividades ejecutadas durante el mes, con el fin de evaluar los resultados obtenidos y definir acciones de mejora que optimicen el desempeño del siguiente mes.</textarea>
           </div>
+
           <div class="xl:col-span-2 min-w-0">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
               <label class="block text-sm font-semibold">Participantes</label>
-              <label class="inline-flex items-center gap-2 text-sm font-semibold text-violet whitespace-nowrap"><input id="chkTodosParticipantes" type="checkbox" class="rounded border-slate-300 text-violet focus:ring-violet"> Seleccionar todos</label>
+              <label class="inline-flex items-center gap-2 text-sm font-semibold text-violet whitespace-nowrap">
+                <input id="chkTodosParticipantes" type="checkbox" class="rounded border-slate-300 text-violet focus:ring-violet">
+                Seleccionar todos
+              </label>
             </div>
+
             <div class="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-300 bg-slate-50 p-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Karelys Guzman" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Karelys Guzman</label>
-                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Adriana Cadena" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Adriana Cadena</label>
-                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Xiomara Correa" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Xiomara Correa</label>
-                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Fabricio Agurto" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Fabricio Agurto</label>
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words">
+                  <input type="checkbox" name="participantes" value="Karelys Guzman" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet">
+                  Karelys Guzman
+                </label>
+
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words">
+                  <input type="checkbox" name="participantes" value="Adriana Cadena" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet">
+                  Adriana Cadena
+                </label>
+
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words">
+                  <input type="checkbox" name="participantes" value="Xiomara Correa" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet">
+                  Xiomara Correa
+                </label>
+
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words">
+                  <input type="checkbox" name="participantes" value="Fabricio Agurto" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet">
+                  Fabricio Agurto
+                </label>
               </div>
             </div>
           </div>
+
           <div>
             <label class="block text-sm font-semibold mb-1">Responsable de llenar la minuta</label>
             <select id="responsableMinuta" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
@@ -110,16 +232,20 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-4 gap-3">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
           <h2 class="text-xl font-extrabold tracking-tight text-violet">Nuevo acuerdo</h2>
-          <button id="btnAgregarAcuerdo" type="button" class="px-5 py-2.5 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">Agregar</button>
+          <button id="btnAgregarAcuerdo" type="button" class="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">
+            Agregar
+          </button>
         </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
           <div class="xl:col-span-2">
             <label class="block text-sm font-semibold mb-1">Acuerdo</label>
             <textarea id="acuerdo" rows="3" placeholder="Describe el acuerdo alcanzado" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3"></textarea>
           </div>
+
           <div>
             <label class="block text-sm font-semibold mb-1">Responsable</label>
             <select id="responsable" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
@@ -130,10 +256,12 @@
               <option value="Fabricio Agurto">Fabricio Agurto</option>
             </select>
           </div>
+
           <div>
             <label class="block text-sm font-semibold mb-1">Fecha compromiso</label>
             <input id="fechaCompromiso" type="date" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
           </div>
+
           <div>
             <label class="block text-sm font-semibold mb-1">Estado</label>
             <select id="estado" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
@@ -142,6 +270,7 @@
               <option value="CUMPLIDO">CUMPLIDO</option>
             </select>
           </div>
+
           <div class="xl:col-span-3">
             <label class="block text-sm font-semibold mb-1">Observaciones</label>
             <textarea id="observaciones" rows="2" placeholder="Notas adicionales" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3"></textarea>
@@ -149,17 +278,22 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-soft">
         <div class="flex flex-col xl:flex-row xl:items-end gap-4 justify-between">
-          <div>
+          <div class="min-w-0">
             <h2 class="text-xl font-extrabold tracking-tight text-violet">Seguimiento de acuerdos</h2>
-            <p class="text-sm md:text-base text-slate-500 mt-1">Filtra por mes para revisar acuerdos anteriores y dar seguimiento a pendientes o vencidos.</p>
+            <p class="text-sm md:text-base text-slate-500 mt-1">
+              Filtra por mes para revisar acuerdos anteriores y dar seguimiento a pendientes o vencidos.
+            </p>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 w-full xl:w-auto">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 w-full xl:w-auto">
             <input id="filtroTexto" type="text" placeholder="Buscar acuerdo o responsable" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
+
             <select id="filtroMes" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
               <option value="">Todos los meses</option>
             </select>
+
             <select id="filtroEstado" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
               <option value="">Todos los estados</option>
               <option value="PENDIENTE">PENDIENTE</option>
@@ -167,6 +301,7 @@
               <option value="CUMPLIDO">CUMPLIDO</option>
               <option value="VENCIDO">VENCIDO</option>
             </select>
+
             <select id="filtroResponsable" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
               <option value="">Todos los responsables</option>
               <option value="Karelys Guzman">Karelys Guzman</option>
@@ -174,13 +309,22 @@
               <option value="Xiomara Correa">Xiomara Correa</option>
               <option value="Fabricio Agurto">Fabricio Agurto</option>
             </select>
-            <button id="btnLimpiarFiltros" class="px-4 py-2 rounded-2xl border border-slate-300 bg-white font-semibold hover:bg-slate-50 transition">Limpiar filtros</button>
+
+            <button id="btnLimpiarFiltros" class="px-4 py-2.5 rounded-2xl border border-slate-300 bg-white font-semibold hover:bg-slate-50 transition">
+              Limpiar filtros
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ring-1 ring-white/60">
-        <div class="max-h-[70vh] overflow-auto">
+      <!-- Vista móvil -->
+      <div class="lg:hidden">
+        <div id="cardsAcuerdos" class="space-y-4"></div>
+      </div>
+
+      <!-- Vista escritorio -->
+      <div class="hidden lg:block bg-white rounded-3xl border border-slate-200 shadow-soft overflow-hidden ring-1 ring-white/60">
+        <div class="table-scroll max-h-[70vh] overflow-auto">
           <table class="min-w-[1700px] w-full text-[13px] md:text-sm">
             <thead class="sticky top-0 z-20 bg-gradient-to-r from-steel to-white border-b border-slate-200 text-violet shadow-sm">
               <tr>
@@ -203,20 +347,39 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'minuta_proveedores_productos_v5';
+    const STORAGE_KEY = 'minuta_proveedores_productos_v6';
     const TEMA_FIJO = 'Indicadores Proveedores y Productos';
     const OBJETIVO_FIJO = 'Revisar y analizar los indicadores de desempeño y las actividades ejecutadas durante el mes, con el fin de evaluar los resultados obtenidos y definir acciones de mejora que optimicen el desempeño del siguiente mes.';
     const DESTINATARIOS = 'adriana.cadena@cresio.com,karelys.guzman@cresio.com,xiomara.correa@cresio.com,datosmaestros@cresio.com';
+
+    const CLAVE_ADMIN = '170290';
+    const SESSION_KEY_ADMIN = 'minuta_admin_autorizado';
 
     let acuerdos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let editandoId = null;
 
     const el = (id) => document.getElementById(id);
 
-    const CLAVE_ADMIN = '170290';
-    const SESSION_KEY_ADMIN = 'minuta_admin_autorizado';
+    const toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2400,
+      timerProgressBar: true,
+      customClass: {
+        popup: 'shadow-xl'
+      },
+      didOpen: (popup) => {
+        popup.addEventListener('mouseenter', Swal.stopTimer);
+        popup.addEventListener('mouseleave', Swal.resumeTimer);
+      }
+    });
 
-    function alerta(icon, title, text = '') {
+    function notificacion(icon, title) {
+      return toast.fire({ icon, title });
+    }
+
+    function modal(icon, title, text = '') {
       return Swal.fire({
         icon,
         title,
@@ -230,11 +393,20 @@
       const y = hoy.getFullYear();
       const m = String(hoy.getMonth() + 1).padStart(2, '0');
       const d = String(hoy.getDate()).padStart(2, '0');
-      return y + '-' + m + '-' + d;
+      return `${y}-${m}-${d}`;
     }
 
     function guardar() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(acuerdos));
+    }
+
+    function escaparHTML(valor) {
+      return String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     function obtenerParticipantesSeleccionados() {
@@ -267,7 +439,8 @@
         'CUMPLIDO': 'bg-emerald-100 text-emerald-800',
         'VENCIDO': 'bg-red-100 text-red-800'
       };
-      return '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold ' + (estilos[estado] || 'bg-slate-100 text-slate-800') + '">' + estado + '</span>';
+
+      return `<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold ${estilos[estado] || 'bg-slate-100 text-slate-800'}">${escaparHTML(estado)}</span>`;
     }
 
     function limpiarFormularioAcuerdo() {
@@ -296,7 +469,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function agregarOActualizar() {
+    async function agregarOActualizar() {
       const fechaReunion = el('fechaReunion').value;
       const participantesLista = obtenerParticipantesSeleccionados();
       const responsableMinuta = el('responsableMinuta').value;
@@ -306,47 +479,51 @@
       const estado = el('estado').value;
       const observaciones = el('observaciones').value.trim();
 
-      if (!fechaReunion) return alerta('warning', 'Debe ingresar la fecha de la reunión.');
-      if (!responsableMinuta) return alerta('warning', 'Debe seleccionar quién llenó la minuta.');
-      if (!participantesLista.length) return alerta('warning', 'Debe seleccionar al menos un participante.');
-      if (!acuerdo) return alerta('warning', 'Debe ingresar el acuerdo.');
-      if (!responsable) return alerta('warning', 'Debe seleccionar el responsable.');
-      if (!fechaCompromiso) return alerta('warning', 'Debe ingresar la fecha compromiso.');
+      if (!fechaReunion) return modal('warning', 'Debe ingresar la fecha de la reunión.');
+      if (!responsableMinuta) return modal('warning', 'Debe seleccionar quién llenó la minuta.');
+      if (!participantesLista.length) return modal('warning', 'Debe seleccionar al menos un participante.');
+      if (!acuerdo) return modal('warning', 'Debe ingresar el acuerdo.');
+      if (!responsable) return modal('warning', 'Debe seleccionar el responsable.');
+      if (!fechaCompromiso) return modal('warning', 'Debe ingresar la fecha compromiso.');
 
       const previo = editandoId ? acuerdos.find(x => x.uid === editandoId) : null;
+
       const registro = {
         uid: editandoId || Date.now(),
-        fechaReunion: fechaReunion,
-        acuerdo: acuerdo,
-        responsable: responsable,
-        fechaCompromiso: fechaCompromiso,
-        estado: estado,
-        observaciones: observaciones,
-        participantesLista: participantesLista,
+        fechaReunion,
+        acuerdo,
+        responsable,
+        fechaCompromiso,
+        estado,
+        observaciones,
+        participantesLista,
         participantes: participantesLista.join(', '),
-        responsableMinuta: responsableMinuta,
+        responsableMinuta,
         temaReunion: TEMA_FIJO,
         fechaRegistro: previo && previo.fechaRegistro ? previo.fechaRegistro : new Date().toISOString()
       };
 
-      if (editandoId) {
+      const estabaEditando = Boolean(editandoId);
+
+      if (estabaEditando) {
         acuerdos = acuerdos.map(item => item.uid === editandoId ? registro : item);
       } else {
         acuerdos.unshift(registro);
       }
 
-      const mensaje = editandoId ? 'Acuerdo actualizado correctamente.' : 'Acuerdo agregado correctamente.';
       editandoId = null;
       guardar();
       render();
       limpiarFormularioAcuerdo();
-      alerta('success', mensaje);
+
+      notificacion('success', estabaEditando ? 'Acuerdo actualizado correctamente' : 'Acuerdo agregado correctamente');
     }
 
     async function eliminarAcuerdo(uid) {
       const autorizado = await solicitarClaveAdmin();
       if (!autorizado) return;
-      Swal.fire({
+
+      const result = await Swal.fire({
         icon: 'question',
         title: '¿Deseas eliminar este acuerdo?',
         showCancelButton: true,
@@ -354,21 +531,25 @@
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#FF3B1F',
         cancelButtonColor: '#49267F'
-      }).then((result) => {
-        if (!result.isConfirmed) return;
-        acuerdos = acuerdos.filter(item => item.uid !== uid);
-        guardar();
-        render();
-        alerta('success', 'Acuerdo eliminado correctamente.');
       });
+
+      if (!result.isConfirmed) return;
+
+      acuerdos = acuerdos.filter(item => item.uid !== uid);
+      guardar();
+      render();
+      notificacion('success', 'Acuerdo eliminado correctamente');
     }
 
     async function duplicarAcuerdo(uid) {
       const autorizado = await solicitarClaveAdmin();
       if (!autorizado) return;
+
       const item = acuerdos.find(x => x.uid === uid);
       if (!item) return;
+
       const nuevaFechaReunion = el('fechaReunion').value || hoyISO();
+
       const duplicado = {
         uid: Date.now(),
         fechaReunion: nuevaFechaReunion,
@@ -376,17 +557,20 @@
         responsable: item.responsable,
         fechaCompromiso: item.fechaCompromiso,
         estado: 'PENDIENTE',
-        observaciones: item.observaciones ? item.observaciones + ' | Reprogramado desde ' + item.fechaReunion : 'Reprogramado desde ' + item.fechaReunion,
+        observaciones: item.observaciones
+          ? `${item.observaciones} | Reprogramado desde ${item.fechaReunion}`
+          : `Reprogramado desde ${item.fechaReunion}`,
         participantesLista: item.participantesLista || [],
         participantes: item.participantes || '',
         responsableMinuta: item.responsableMinuta || '',
         temaReunion: TEMA_FIJO,
         fechaRegistro: new Date().toISOString()
       };
+
       acuerdos.unshift(duplicado);
       guardar();
       render();
-      alerta('success', 'Acuerdo duplicado correctamente para el siguiente periodo.');
+      notificacion('success', 'Acuerdo duplicado correctamente');
     }
 
     function filtrarDatos() {
@@ -397,15 +581,19 @@
 
       return acuerdos.filter(item => {
         const estadoFinal = estadoCalculado(item);
-        const matchTexto = !texto ||
+
+        const matchTexto =
+          !texto ||
           (item.acuerdo || '').toLowerCase().includes(texto) ||
           (item.responsable || '').toLowerCase().includes(texto) ||
           (item.responsableMinuta || '').toLowerCase().includes(texto) ||
           (item.observaciones || '').toLowerCase().includes(texto) ||
           (item.participantes || '').toLowerCase().includes(texto);
+
         const matchMes = !mes || (item.fechaReunion || '').slice(0, 7) === mes;
         const matchEstado = !estado || estadoFinal === estado;
         const matchResponsable = !responsable || item.responsable === responsable;
+
         return matchTexto && matchMes && matchEstado && matchResponsable;
       });
     }
@@ -415,13 +603,17 @@
       const actual = select.value;
       const meses = [...new Set(acuerdos.map(x => (x.fechaReunion || '').slice(0, 7)).filter(Boolean))].sort().reverse();
       const nombresMes = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
       select.innerHTML = '<option value="">Todos los meses</option>' + meses.map(m => {
         const partes = m.split('-');
         const anio = partes[0];
         const mes = partes[1];
-        return '<option value="' + m + '">' + nombresMes[Number(mes) - 1] + ' ' + anio + '</option>';
+        return `<option value="${m}">${nombresMes[Number(mes) - 1]} ${anio}</option>`;
       }).join('');
-      if ([...select.options].some(opt => opt.value === actual)) select.value = actual;
+
+      if ([...select.options].some(opt => opt.value === actual)) {
+        select.value = actual;
+      }
     }
 
     function renderKPIs(data) {
@@ -433,6 +625,7 @@
 
     function renderTabla(data) {
       const tbody = el('tablaAcuerdos');
+
       if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-10 text-center text-slate-500 font-medium">No hay acuerdos registrados.</td></tr>';
         return;
@@ -440,24 +633,101 @@
 
       tbody.innerHTML = data.map(item => {
         const estado = estadoCalculado(item);
-        return '' +
-          '<tr class="hover:bg-white/80 align-top even:bg-slate-50/60 transition-colors">' +
-            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.fechaReunion || '') + '</td>' +
-            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[420px] font-medium text-slate-700">' + (item.acuerdo || '') + '</td>' +
-            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.responsable || '') + '</td>' +
-            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.fechaCompromiso || '') + '</td>' +
-            '<td class="px-4 py-4">' + badgeEstado(estado) + '</td>' +
-            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">' + (item.observaciones || '') + '</td>' +
-            '<td class="px-4 py-4">' +
-              '<div class="flex flex-col gap-2 min-w-[110px]">' +
-                '<button onclick="editarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-violet text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Editar</button>' +
-                '<button onclick="duplicarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Duplicar</button>' +
-                '<button onclick="eliminarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-tomato text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Eliminar</button>' +
-              '</div>' +
-            '</td>' +
-            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">' + (item.participantes || '') + '</td>' +
-            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.responsableMinuta || '') + '</td>' +
-          '</tr>';
+
+        return `
+          <tr class="hover:bg-white/80 align-top even:bg-slate-50/60 transition-colors">
+            <td class="px-4 py-4 whitespace-nowrap font-medium">${escaparHTML(item.fechaReunion || '')}</td>
+            <td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[420px] font-medium text-slate-700">${escaparHTML(item.acuerdo || '')}</td>
+            <td class="px-4 py-4 whitespace-nowrap font-medium">${escaparHTML(item.responsable || '')}</td>
+            <td class="px-4 py-4 whitespace-nowrap font-medium">${escaparHTML(item.fechaCompromiso || '')}</td>
+            <td class="px-4 py-4">${badgeEstado(estado)}</td>
+            <td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">${escaparHTML(item.observaciones || '')}</td>
+            <td class="px-4 py-4">
+              <div class="flex flex-col gap-2 min-w-[110px]">
+                <button onclick="editarAcuerdo(${item.uid})" class="px-3 py-2 rounded-xl bg-violet text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Editar</button>
+                <button onclick="duplicarAcuerdo(${item.uid})" class="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Duplicar</button>
+                <button onclick="eliminarAcuerdo(${item.uid})" class="px-3 py-2 rounded-xl bg-tomato text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Eliminar</button>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">${escaparHTML(item.participantes || '')}</td>
+            <td class="px-4 py-4 whitespace-nowrap font-medium">${escaparHTML(item.responsableMinuta || '')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderCards(data) {
+      const contenedor = el('cardsAcuerdos');
+
+      if (!data.length) {
+        contenedor.innerHTML = `
+          <div class="bg-white rounded-3xl border border-slate-200 p-6 text-center text-slate-500 font-medium shadow-soft">
+            No hay acuerdos registrados.
+          </div>
+        `;
+        return;
+      }
+
+      contenedor.innerHTML = data.map(item => {
+        const estado = estadoCalculado(item);
+
+        return `
+          <div class="bg-white rounded-3xl border border-slate-200 p-4 shadow-soft">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="min-w-0">
+                <p class="text-xs uppercase tracking-wide text-slate-500 font-bold">Fecha reunión</p>
+                <p class="text-sm font-semibold text-slate-700">${escaparHTML(item.fechaReunion || '')}</p>
+              </div>
+              <div>${badgeEstado(estado)}</div>
+            </div>
+
+            <div class="space-y-3 text-sm">
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Acuerdo</p>
+                <p class="text-slate-700 leading-6 break-words">${escaparHTML(item.acuerdo || '')}</p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Responsable</p>
+                  <p class="text-slate-700 font-medium">${escaparHTML(item.responsable || '')}</p>
+                </div>
+
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Fecha compromiso</p>
+                  <p class="text-slate-700 font-medium">${escaparHTML(item.fechaCompromiso || '')}</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Observaciones</p>
+                <p class="text-slate-700 break-words">${escaparHTML(item.observaciones || '') || '<span class="text-slate-400">Sin observaciones</span>'}</p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Participantes</p>
+                <p class="text-slate-700 break-words">${escaparHTML(item.participantes || '')}</p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Responsable minuta</p>
+                <p class="text-slate-700 font-medium">${escaparHTML(item.responsableMinuta || '')}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
+              <button onclick="editarAcuerdo(${item.uid})" class="px-3 py-2.5 rounded-2xl bg-violet text-white text-sm font-bold hover:opacity-90 transition">
+                Editar
+              </button>
+              <button onclick="duplicarAcuerdo(${item.uid})" class="px-3 py-2.5 rounded-2xl bg-amber-500 text-white text-sm font-bold hover:opacity-90 transition">
+                Duplicar
+              </button>
+              <button onclick="eliminarAcuerdo(${item.uid})" class="px-3 py-2.5 rounded-2xl bg-tomato text-white text-sm font-bold hover:opacity-90 transition">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        `;
       }).join('');
     }
 
@@ -466,6 +736,7 @@
       const data = filtrarDatos();
       renderKPIs(data);
       renderTabla(data);
+      renderCards(data);
     }
 
     function sesionAdminActiva() {
@@ -482,6 +753,7 @@
 
     async function solicitarClaveAdmin() {
       if (sesionAdminActiva()) return true;
+
       const result = await Swal.fire({
         title: 'Clave requerida',
         text: 'Ingresa la contraseña de administrador para continuar.',
@@ -503,20 +775,24 @@
       });
 
       if (!result.isConfirmed) return false;
+
       if (result.value !== CLAVE_ADMIN) {
-        await alerta('error', 'Contraseña incorrecta.', 'No tienes permiso para realizar esta acción.');
+        await modal('error', 'Contraseña incorrecta.', 'No tienes permiso para realizar esta acción.');
         return false;
       }
+
       activarSesionAdmin();
-      await alerta('success', 'Acceso autorizado.', 'La sesión de administrador estará activa mientras mantengas abierta esta pestaña.');
+      notificacion('success', 'Acceso autorizado');
       return true;
     }
 
     async function editarAcuerdo(uid) {
       const autorizado = await solicitarClaveAdmin();
       if (!autorizado) return;
+
       const item = acuerdos.find(x => x.uid === uid);
       if (!item) return;
+
       cargarEnFormulario(item);
     }
 
@@ -524,7 +800,7 @@
       if (!valor) return '';
       const partes = String(valor).split('-');
       if (partes.length !== 3) return String(valor);
-      return partes[2] + '-' + partes[1] + '-' + partes[0];
+      return `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
 
     function excelDateToISO(valor) {
@@ -535,7 +811,7 @@
         const y = fecha.getFullYear();
         const m = String(fecha.getMonth() + 1).padStart(2, '0');
         const d = String(fecha.getDate()).padStart(2, '0');
-        return y + '-' + m + '-' + d;
+        return `${y}-${m}-${d}`;
       }
 
       const texto = String(valor).trim();
@@ -547,19 +823,19 @@
         const y = fecha.getFullYear();
         const m = String(fecha.getMonth() + 1).padStart(2, '0');
         const d = String(fecha.getDate()).padStart(2, '0');
-        return y + '-' + m + '-' + d;
+        return `${y}-${m}-${d}`;
       }
 
       if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return texto;
 
       if (/^\d{2}\/\d{2}\/\d{4}$/.test(texto)) {
         const partes = texto.split('/');
-        return partes[2] + '-' + partes[1] + '-' + partes[0];
+        return `${partes[2]}-${partes[1]}-${partes[0]}`;
       }
 
       if (/^\d{2}-\d{2}-\d{4}$/.test(texto)) {
         const partes = texto.split('-');
-        return partes[2] + '-' + partes[1] + '-' + partes[0];
+        return `${partes[2]}-${partes[1]}-${partes[0]}`;
       }
 
       if (/^\d{4}-\d{2}-\d{2}T/.test(texto)) {
@@ -576,12 +852,14 @@
 
     function exportarExcel(tipo) {
       const data = filtrarDatos();
+
       if (!data.length) {
-        alerta('warning', 'No hay información para exportar.');
+        modal('warning', 'No hay información para exportar.');
         return;
       }
 
       const wb = XLSX.utils.book_new();
+
       if (tipo === 'detalle') {
         const detalle = data.map(item => ({
           'Fecha reunión': formatoDDMMYYYY(item.fechaReunion),
@@ -595,19 +873,24 @@
           'Responsable minuta': item.responsableMinuta,
           'Fecha registro': fechaRegistroVisible(item.fechaRegistro)
         }));
+
         const ws = XLSX.utils.json_to_sheet(detalle);
         ws['!cols'] = [
           { wch: 14 }, { wch: 55 }, { wch: 22 }, { wch: 16 }, { wch: 18 },
           { wch: 14 }, { wch: 35 }, { wch: 35 }, { wch: 24 }, { wch: 22 }
         ];
+
         XLSX.utils.book_append_sheet(wb, ws, 'Detalle');
         XLSX.writeFile(wb, 'Minuta_Detalle_Acuerdos.xlsx');
+        notificacion('success', 'Excel detalle descargado');
         return;
       }
 
       const agrupado = {};
+
       data.forEach(item => {
-        const clave = item.fechaReunion + '__' + item.responsableMinuta;
+        const clave = `${item.fechaReunion}__${item.responsableMinuta}`;
+
         if (!agrupado[clave]) {
           agrupado[clave] = {
             'Fecha reunión': formatoDDMMYYYY(item.fechaReunion),
@@ -619,8 +902,10 @@
             'Vencidos': 0
           };
         }
+
         agrupado[clave]['Total acuerdos'] += 1;
         const est = estadoCalculado(item);
+
         if (est === 'CUMPLIDO') agrupado[clave]['Cumplidos'] += 1;
         else if (est === 'VENCIDO') agrupado[clave]['Vencidos'] += 1;
         else agrupado[clave]['Pendientes'] += 1;
@@ -628,13 +913,18 @@
 
       const resumen = Object.values(agrupado);
       const ws = XLSX.utils.json_to_sheet(resumen);
-      ws['!cols'] = [{ wch: 14 }, { wch: 35 }, { wch: 24 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+      ws['!cols'] = [
+        { wch: 14 }, { wch: 35 }, { wch: 24 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }
+      ];
+
       XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
       XLSX.writeFile(wb, 'Minuta_Resumen_Reuniones.xlsx');
+      notificacion('success', 'Excel resumen descargado');
     }
 
     function descargarPlantilla() {
       const wb = XLSX.utils.book_new();
+
       const plantilla = [{
         'Fecha reunión': '',
         'Acuerdo': '',
@@ -646,13 +936,16 @@
         'Responsable minuta': '',
         'Fecha registro': ''
       }];
+
       const ws = XLSX.utils.json_to_sheet(plantilla);
       ws['!cols'] = [
         { wch: 14 }, { wch: 55 }, { wch: 22 }, { wch: 16 }, { wch: 18 },
         { wch: 35 }, { wch: 35 }, { wch: 24 }, { wch: 22 }
       ];
+
       XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
       XLSX.writeFile(wb, 'Plantilla_Minuta_Proveedores_y_Productos.xlsx');
+      notificacion('success', 'Plantilla descargada');
     }
 
     function normalizarFilaImportada(row) {
@@ -671,15 +964,15 @@
 
       return {
         uid: Date.now() + Math.floor(Math.random() * 100000),
-        fechaReunion: fechaReunion,
-        acuerdo: acuerdo,
-        responsable: responsable,
-        fechaCompromiso: fechaCompromiso,
+        fechaReunion,
+        acuerdo,
+        responsable,
+        fechaCompromiso,
         estado: ['PENDIENTE', 'EN PROCESO', 'CUMPLIDO'].includes(estado) ? estado : 'PENDIENTE',
-        observaciones: observaciones,
-        participantesLista: participantesLista,
-        participantes: participantes,
-        responsableMinuta: responsableMinuta,
+        observaciones,
+        participantesLista,
+        participantes,
+        responsableMinuta,
         temaReunion: TEMA_FIJO,
         fechaRegistro: fechaRegistroImportada
       };
@@ -687,6 +980,7 @@
 
     function importarExcel(file) {
       const reader = new FileReader();
+
       reader.onload = function(e) {
         try {
           const data = new Uint8Array(e.target.result);
@@ -696,20 +990,21 @@
           const registros = json.map(normalizarFilaImportada).filter(Boolean);
 
           if (!registros.length) {
-            alerta('warning', 'El archivo no contiene filas válidas para importar.', 'Verifica que tenga las columnas esperadas y fechas válidas.');
+            modal('warning', 'El archivo no contiene filas válidas para importar.', 'Verifica que tenga las columnas esperadas y fechas válidas.');
             return;
           }
 
           acuerdos = registros.concat(acuerdos);
           guardar();
           render();
-          alerta('success', 'Minuta cargada correctamente.', 'Se importaron ' + registros.length + ' acuerdo(s).');
           el('inputImportarExcel').value = '';
+          notificacion('success', `Se importaron ${registros.length} acuerdo(s)`);
         } catch (error) {
           console.error(error);
-          alerta('error', 'No se pudo cargar el archivo.', 'Verifica que el Excel tenga el formato esperado.');
+          modal('error', 'No se pudo cargar el archivo.', 'Verifica que el Excel tenga el formato esperado.');
         }
       };
+
       reader.readAsArrayBuffer(file);
     }
 
@@ -718,18 +1013,22 @@
       if (!data.length) return 'No hay acuerdos registrados.';
 
       const agrupado = {};
+
       data.forEach(item => {
         if (!agrupado[item.responsable]) agrupado[item.responsable] = [];
         agrupado[item.responsable].push(item);
       });
 
       let texto = '';
+
       Object.keys(agrupado).forEach(resp => {
-        texto += resp + ':' + '\n';
+        texto += resp + ':\n';
+
         agrupado[resp].forEach(x => {
-          texto += '  - ' + x.acuerdo + '\n';
-          texto += '    Fecha: ' + formatoDDMMYYYY(x.fechaCompromiso) + ' | Estado: ' + estadoCalculado(x) + '\n';
+          texto += `  - ${x.acuerdo}\n`;
+          texto += `    Fecha: ${formatoDDMMYYYY(x.fechaCompromiso)} | Estado: ${estadoCalculado(x)}\n`;
         });
+
         texto += '\n';
       });
 
@@ -738,11 +1037,14 @@
 
     function enviarCorreo() {
       const data = filtrarDatos();
+
       if (!data.length) {
-        alerta('warning', 'No hay acuerdos registrados para preparar el correo.');
+        modal('warning', 'No hay acuerdos registrados para preparar el correo.');
         return;
       }
+
       exportarExcel('detalle');
+
       const asunto = encodeURIComponent('Minuta de reunión - Indicadores Proveedores y Productos');
       const cuerpoPlano = [
         'Buenas tardes,',
@@ -756,8 +1058,9 @@
         '',
         'Saludos'
       ].join('\n');
+
       const cuerpo = encodeURIComponent(cuerpoPlano);
-      window.location.href = 'mailto:' + DESTINATARIOS + '?subject=' + asunto + '&body=' + cuerpo;
+      window.location.href = `mailto:${DESTINATARIOS}?subject=${asunto}&body=${cuerpo}`;
     }
 
     el('temaReunion').value = TEMA_FIJO;
@@ -778,6 +1081,7 @@
     el('btnExportarDetalle').addEventListener('click', () => exportarExcel('detalle'));
     el('btnDescargarPlantilla').addEventListener('click', descargarPlantilla);
     el('btnEnviarCorreo').addEventListener('click', enviarCorreo);
+
     el('inputImportarExcel').addEventListener('change', (e) => {
       const file = e.target.files && e.target.files[0];
       if (file) importarExcel(file);
@@ -794,19 +1098,21 @@
       el('filtroEstado').value = '';
       el('filtroResponsable').value = '';
       render();
+      notificacion('success', 'Filtros limpiados');
     });
 
     el('btnCerrarSesionAdmin').addEventListener('click', () => {
       if (!sesionAdminActiva()) {
-        alerta('info', 'No hay sesión activa.', 'Todavía no has validado la contraseña de administrador en esta pestaña.');
+        modal('info', 'No hay sesión activa.', 'Todavía no has validado la contraseña de administrador en esta pestaña.');
         return;
       }
+
       cerrarSesionAdmin();
-      alerta('success', 'Sesión cerrada.', 'La próxima acción protegida volverá a pedir la contraseña.');
+      notificacion('success', 'Sesión de administrador cerrada');
     });
 
-    el('btnLimpiarTodo').addEventListener('click', () => {
-      Swal.fire({
+    el('btnLimpiarTodo').addEventListener('click', async () => {
+      const result = await Swal.fire({
         icon: 'warning',
         title: 'Esto eliminará todos los acuerdos guardados en este navegador.',
         text: '¿Deseas continuar?',
@@ -815,17 +1121,18 @@
         cancelButtonText: 'Cancelar',
         confirmButtonColor: '#FF3B1F',
         cancelButtonColor: '#49267F'
-      }).then((result) => {
-        if (!result.isConfirmed) return;
-        acuerdos = [];
-        guardar();
-        limpiarFormularioAcuerdo();
-        el('fechaReunion').value = '';
-        el('responsableMinuta').value = '';
-        marcarParticipantes([]);
-        render();
-        alerta('success', 'Información eliminada correctamente.');
       });
+
+      if (!result.isConfirmed) return;
+
+      acuerdos = [];
+      guardar();
+      limpiarFormularioAcuerdo();
+      el('fechaReunion').value = '';
+      el('responsableMinuta').value = '';
+      marcarParticipantes([]);
+      render();
+      notificacion('success', 'Información eliminada correctamente');
     });
 
     window.editarAcuerdo = editarAcuerdo;
