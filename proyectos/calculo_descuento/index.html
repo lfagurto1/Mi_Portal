@@ -4,8 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cálculo PVPx + IVA</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -25,27 +33,38 @@
           },
           fontFamily: {
             display: ['Rajdhani', 'sans-serif'],
-            body:    ['Barlow', 'sans-serif'],
+            body: ['Barlow', 'sans-serif'],
           },
+          boxShadow: {
+            neon: '0 0 0 1px rgba(0,194,255,0.12), 0 0 25px rgba(0,194,255,0.08)',
+          }
         }
       }
     }
   </script>
+
   <style>
     :root {
-      --cyan:    #00c2ff;
-      --teal:    #00ffc8;
-      --red:     #ff4e6a;
-      --amber:   #ffb347;
-      --bg:      #0b0f1a;
-      --s800:    #0d1525;
-      --s700:    #131929;
-      --s600:    #1a2236;
-      --s500:    #1e3050;
-      --text:    #e8edf5;
-      --muted:   #5a7090;
+      --cyan:  #00c2ff;
+      --teal:  #00ffc8;
+      --red:   #ff4e6a;
+      --amber: #ffb347;
+      --bg:    #0b0f1a;
+      --s800:  #0d1525;
+      --s700:  #131929;
+      --s600:  #1a2236;
+      --s500:  #1e3050;
+      --text:  #e8edf5;
+      --muted: #5a7090;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       font-family: 'Barlow', sans-serif;
       background-color: var(--bg);
@@ -56,231 +75,339 @@
         repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,80,0.25) 40px),
         repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,80,0.12) 40px);
     }
+
     .font-display { font-family: 'Rajdhani', sans-serif; }
+
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; }
-    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
 
     .header-glow::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0;
+      position: absolute;
+      top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--cyan), var(--teal), transparent);
     }
+
     .panel-glow::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0;
+      position: absolute;
+      top: 0; left: 0; right: 0;
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(0,194,255,0.25), transparent);
     }
+
     .hero-glow::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0;
+      position: absolute;
+      top: 0; left: 0; right: 0;
       height: 1px;
       background: linear-gradient(90deg, var(--cyan), var(--teal));
     }
-    @keyframes pulse-glow {
-      0%,100% { box-shadow: 0 0 0 0 rgba(0,194,255,0); }
-      50%      { box-shadow: 0 0 20px 4px rgba(0,194,255,0.22); }
-    }
-    .hero-pulse { animation: pulse-glow 0.9s ease; }
-    .bar-fill { transition: width 0.5s cubic-bezier(0.25,0.8,0.25,1), background 0.5s; }
 
-    /* Custom input style (Tailwind can't do pseudo cleanly) */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,194,255,0); }
+      50% { box-shadow: 0 0 20px 4px rgba(0,194,255,0.22); }
+    }
+
+    .hero-pulse { animation: pulse-glow 0.9s ease; }
+
+    .bar-fill {
+      transition: width 0.5s cubic-bezier(0.25,0.8,0.25,1), background 0.5s;
+    }
+
     .custom-input {
       width: 100%;
       background: var(--s800);
       border: 1px solid var(--s500);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text);
       font-family: 'Rajdhani', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 500;
-      padding: 12px 48px 12px 16px;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 600;
+      padding: 14px 44px 14px 14px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      min-height: 54px;
     }
+
     .custom-input::placeholder { color: var(--muted); }
+
     .custom-input:focus {
       border-color: var(--cyan);
-      box-shadow: 0 0 0 3px rgba(0,194,255,0.1);
+      box-shadow: 0 0 0 3px rgba(0,194,255,0.10);
+      transform: translateY(-1px);
+    }
+
+    .glass-card {
+      background: rgba(19, 25, 41, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .result-value {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 640px) {
+      .mobile-tight {
+        letter-spacing: 0.12em !important;
+      }
+    }
+
+    .swal2-popup {
+      border-radius: 18px !important;
+      background: #131929 !important;
+      color: #e8edf5 !important;
+      border: 1px solid rgba(0,194,255,0.18) !important;
+      box-shadow: 0 0 0 1px rgba(0,194,255,0.08), 0 0 28px rgba(0,194,255,0.08) !important;
+    }
+
+    .swal2-title,
+    .swal2-html-container {
+      color: #e8edf5 !important;
+    }
+
+    .swal2-confirm {
+      background: linear-gradient(135deg, #00c2ff, #00ffc8) !important;
+      color: #0b0f1a !important;
+      font-weight: 700 !important;
+      border-radius: 10px !important;
+    }
+
+    .swal2-cancel {
+      border-radius: 10px !important;
     }
   </style>
 </head>
 
-<body class="pb-16">
-
-  <!-- ── HEADER ── -->
+<body class="pb-10 sm:pb-16">
+  <!-- HEADER -->
   <header class="relative bg-gradient-to-br from-[#0d1a2e] to-[#0b1520] border-b border-[#1e3050] header-glow overflow-hidden">
-    <div class="absolute top-[-60px] right-[-60px] w-48 h-48 rounded-full"
-         style="background: radial-gradient(circle, rgba(0,194,255,0.06) 0%, transparent 70%)"></div>
-    <div class="relative max-w-4xl mx-auto px-4 sm:px-8 py-5 flex items-center gap-4">
-      <!-- Icon -->
-      <div class="relative shrink-0 w-11 h-11 border border-[#00c2ff] rounded-lg flex items-center justify-center">
-        <span class="font-display text-xl font-bold text-[#00c2ff] relative z-10">↓</span>
+    <div
+      class="absolute top-[-60px] right-[-60px] w-40 h-40 sm:w-48 sm:h-48 rounded-full"
+      style="background: radial-gradient(circle, rgba(0,194,255,0.06) 0%, transparent 70%)">
+    </div>
+
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center gap-3 sm:gap-4">
+      <div class="relative shrink-0 w-10 h-10 sm:w-11 sm:h-11 border border-[#00c2ff] rounded-lg flex items-center justify-center">
+        <span class="font-display text-lg sm:text-xl font-bold text-[#00c2ff] relative z-10">↓</span>
         <div class="absolute inset-[3px] rounded-md bg-[#00c2ff]/[0.07]"></div>
       </div>
-      <div>
-        <h1 class="font-display text-lg sm:text-2xl font-bold tracking-[0.18em] uppercase text-slate-100">
-          <span class="text-[#00c2ff]">CÁLCULO</span> PVPx + IVA
+
+      <div class="min-w-0">
+        <h1 class="font-display text-base sm:text-2xl font-bold tracking-[0.12em] sm:tracking-[0.18em] uppercase text-slate-100 leading-tight mobile-tight">
+          <span class="text-[#00c2ff]">Cálculo</span> PVPx + IVA
         </h1>
-        <p class="text-[10px] tracking-[0.18em] uppercase text-[#5a7090] mt-0.5">
+        <p class="text-[10px] sm:text-[11px] tracking-[0.14em] sm:tracking-[0.18em] uppercase text-[#5a7090] mt-0.5 leading-relaxed">
           Descuento para llegar al precio objetivo
         </p>
       </div>
     </div>
   </header>
 
-  <!-- ── MAIN ── -->
-  <main class="max-w-4xl mx-auto px-4 sm:px-8 mt-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+  <!-- MAIN -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 lg:gap-6 items-start">
       <!-- INPUTS -->
-      <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-6 panel-glow overflow-hidden">
-        <!-- Panel title -->
-        <div class="flex items-center gap-3 mb-6">
-          <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Datos del producto</span>
+      <section class="relative glass-card border border-[#1e3050] rounded-2xl p-4 sm:p-6 panel-glow overflow-hidden shadow-neon">
+        <div class="flex items-center gap-3 mb-5 sm:mb-6">
+          <span class="font-display text-[10px] sm:text-[11px] font-semibold tracking-[0.20em] sm:tracking-[0.25em] uppercase text-[#00c2ff]">
+            Datos del producto
+          </span>
           <span class="flex-1 h-px bg-[#1e3050]"></span>
         </div>
 
-        <div class="flex flex-col gap-5">
-          <!-- PVP -->
+        <div class="flex flex-col gap-4 sm:gap-5">
           <div>
-            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+            <label class="block text-[10px] sm:text-[11px] font-medium tracking-[0.12em] sm:tracking-[0.15em] uppercase text-[#5a7090] mb-1.5 leading-relaxed">
               PVP + IVA — Precio de Venta al Público
             </label>
             <div class="relative">
-              <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+              <input id="pvp" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" inputmode="decimal" />
               <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
             </div>
           </div>
 
-          <!-- Divider -->
           <div class="flex items-center gap-3">
             <span class="flex-1 h-px bg-[#1e3050]"></span>
             <span class="text-[#5a7090] text-lg select-none">↓</span>
             <span class="flex-1 h-px bg-[#1e3050]"></span>
           </div>
 
-          <!-- PVPx -->
           <div>
-            <label class="block text-[10px] font-medium tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
-              PVPx + IVA — Precio Objetivo
+            <label class="block text-[10px] sm:text-[11px] font-medium tracking-[0.12em] sm:tracking-[0.15em] uppercase text-[#5a7090] mb-1.5 leading-relaxed">
+              PVPx + IVA — Precio objetivo
             </label>
             <div class="relative">
-              <input id="pvpx" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" />
+              <input id="pvpx" type="number" placeholder="0.00" step="0.01" min="0" class="custom-input" inputmode="decimal" />
               <span class="font-display absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#5a7090] pointer-events-none">$</span>
             </div>
           </div>
         </div>
 
-        <!-- Buttons -->
-        <button onclick="calcular()"
-          class="font-display mt-6 w-full py-3.5 rounded-xl font-bold text-sm tracking-[0.2em] uppercase text-[#0b0f1a] transition-all hover:opacity-90 active:scale-[0.99]"
-          style="background: linear-gradient(135deg, #00c2ff, #00ffc8)">
-          CALCULAR
-        </button>
-        <button onclick="resetear()"
-          class="mt-2.5 w-full py-2 rounded-lg border border-[#1e3050] text-[#5a7090] text-xs hover:text-slate-300 hover:border-[#5a7090] transition-all">
-          ↺ Limpiar
-        </button>
-      </div>
+        <div class="mt-6 flex flex-col sm:flex-row gap-2.5">
+          <button
+            onclick="calcular()"
+            class="font-display flex-1 py-3.5 rounded-xl font-bold text-sm tracking-[0.16em] sm:tracking-[0.2em] uppercase text-[#0b0f1a] transition-all hover:opacity-90 active:scale-[0.99]"
+            style="background: linear-gradient(135deg, #00c2ff, #00ffc8)">
+            Calcular
+          </button>
+
+          <button
+            onclick="resetear()"
+            class="sm:w-[170px] py-3 sm:py-3.5 rounded-xl border border-[#1e3050] text-[#a6b4c8] text-xs sm:text-sm hover:text-slate-100 hover:border-[#5a7090] transition-all bg-[#0f1626]">
+            ↺ Limpiar
+          </button>
+        </div>
+      </section>
 
       <!-- RESULTS -->
-      <div class="relative bg-[#131929] border border-[#1e3050] rounded-2xl p-6 panel-glow overflow-hidden flex flex-col gap-4">
+      <section class="relative glass-card border border-[#1e3050] rounded-2xl p-4 sm:p-6 panel-glow overflow-hidden flex flex-col gap-4 shadow-neon">
         <div class="flex items-center gap-3">
-          <span class="font-display text-[10px] font-semibold tracking-[0.25em] uppercase text-[#00c2ff]">Resultado</span>
+          <span class="font-display text-[10px] sm:text-[11px] font-semibold tracking-[0.20em] sm:tracking-[0.25em] uppercase text-[#00c2ff]">
+            Resultado
+          </span>
           <span class="flex-1 h-px bg-[#1e3050]"></span>
         </div>
 
-        <!-- Warning -->
-        <div id="warning-box" class="hidden flex-row items-start gap-3 rounded-xl px-4 py-3 text-sm"
-             style="background: rgba(255,78,106,0.08); border: 1px solid rgba(255,78,106,0.3); color: #ff4e6a;">
-          <span class="shrink-0 mt-0.5">⚠</span>
-          <span id="warning-msg"></span>
+        <div
+          id="hero-result"
+          class="relative hero-glow overflow-hidden rounded-xl px-4 sm:px-6 py-6 sm:py-8 text-center"
+          style="background: linear-gradient(135deg, rgba(0,194,255,0.07) 0%, rgba(0,255,200,0.04) 100%); border: 1px solid rgba(0,194,255,0.28);">
+          <p class="text-[10px] sm:text-[11px] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#5a7090] mb-2">
+            Descuento a aplicar
+          </p>
+          <p id="r-desc" class="font-display font-bold leading-none transition-all text-[#5a7090] result-value" style="font-size: clamp(2.4rem, 10vw, 5rem);">
+            —
+          </p>
+          <p id="r-desc-sub" class="text-xs sm:text-sm text-[#5a7090] mt-3 leading-relaxed break-words">
+            ingresa los datos y calcula
+          </p>
         </div>
 
-        <!-- Hero card -->
-        <div id="hero-result"
-             class="relative hero-glow overflow-hidden rounded-xl px-6 py-8 text-center"
-             style="background: linear-gradient(135deg, rgba(0,194,255,0.07) 0%, rgba(0,255,200,0.04) 100%); border: 1px solid rgba(0,194,255,0.28);">
-          <p class="text-[10px] tracking-[0.22em] uppercase text-[#5a7090] mb-2">Descuento a Aplicar</p>
-          <p id="r-desc" class="font-display font-bold leading-none transition-all text-[#5a7090]"
-             style="font-size: clamp(3rem, 12vw, 5rem);">—</p>
-          <p id="r-desc-sub" class="text-xs text-[#5a7090] mt-3">ingresa los datos y calcula</p>
-        </div>
-
-        <!-- Secondary cards -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
-            <p class="text-[9px] tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">Valor Descuento ($)</p>
-            <p id="r-valor" class="font-display text-2xl font-bold text-[#5a7090] transition-all">—</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rounded-xl p-4 min-w-0" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+              Valor descuento ($)
+            </p>
+            <p id="r-valor" class="font-display text-xl sm:text-2xl font-bold text-[#5a7090] transition-all result-value">
+              —
+            </p>
           </div>
-          <div class="rounded-xl p-4" style="background:#1a2236; border:1px solid #1e3050;">
-            <p class="text-[9px] tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">PVPx + IVA confirmado</p>
-            <p id="r-pvpx-conf" class="font-display text-2xl font-bold text-[#5a7090] transition-all">—</p>
+
+          <div class="rounded-xl p-4 min-w-0" style="background:#1a2236; border:1px solid #1e3050;">
+            <p class="text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.15em] uppercase text-[#5a7090] mb-1.5">
+              PVPx + IVA confirmado
+            </p>
+            <p id="r-pvpx-conf" class="font-display text-xl sm:text-2xl font-bold text-[#5a7090] transition-all result-value">
+              —
+            </p>
           </div>
         </div>
 
-        <!-- Progress bar -->
         <div class="rounded-xl px-4 py-3.5" style="background:#1a2236; border:1px solid #1e3050;">
-          <div class="flex justify-between items-center mb-2.5">
-            <span class="text-[9px] tracking-[0.15em] uppercase text-[#5a7090]">Descuento sobre PVP</span>
-            <span id="bar-pct-txt" class="font-display text-sm font-semibold text-slate-400">—</span>
+          <div class="flex justify-between items-center gap-3 mb-2.5">
+            <span class="text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.15em] uppercase text-[#5a7090]">
+              Descuento sobre PVP
+            </span>
+            <span id="bar-pct-txt" class="font-display text-sm font-semibold text-slate-400 shrink-0">
+              —
+            </span>
           </div>
-          <div class="h-1.5 rounded-full overflow-hidden" style="background: rgba(255,255,255,0.05);">
-            <div id="bar-fill" class="bar-fill h-full rounded-full w-0"
-                 style="background: linear-gradient(90deg,#00c2ff,#00ffc8)"></div>
+
+          <div class="h-2 rounded-full overflow-hidden" style="background: rgba(255,255,255,0.05);">
+            <div id="bar-fill" class="bar-fill h-full rounded-full w-0" style="background: linear-gradient(90deg,#00c2ff,#00ffc8)"></div>
           </div>
         </div>
-
-      </div>
+      </section>
     </div>
 
-    <!-- Footer note -->
-    <p class="text-center text-[10px] tracking-widest uppercase text-[#5a7090] mt-8 opacity-50">
+    <p class="text-center text-[10px] sm:text-[11px] tracking-[0.12em] sm:tracking-widest uppercase text-[#5a7090] mt-6 sm:mt-8 opacity-60 leading-relaxed px-2">
       Fórmula: ROUND(PVP+IVA − PVPx+IVA, 2) / PVP+IVA
     </p>
   </main>
 
   <script>
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2200,
+      timerProgressBar: true
+    });
+
     function fmt(n, dec = 2) {
-      return n.toLocaleString('es-EC', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+      return n.toLocaleString('es-EC', {
+        minimumFractionDigits: dec,
+        maximumFractionDigits: dec
+      });
     }
-    function showWarn(msg) {
-      const b = document.getElementById('warning-box');
-      document.getElementById('warning-msg').textContent = msg;
-      b.classList.remove('hidden'); b.classList.add('flex');
+
+    function alertaError(titulo, mensaje) {
+      Swal.fire({
+        icon: 'error',
+        title: titulo,
+        html: mensaje,
+        confirmButtonText: 'Entendido'
+      });
     }
-    function hideWarn() {
-      const b = document.getElementById('warning-box');
-      b.classList.add('hidden'); b.classList.remove('flex');
+
+    function alertaInfo(titulo, mensaje) {
+      Swal.fire({
+        icon: 'info',
+        title: titulo,
+        html: mensaje,
+        confirmButtonText: 'Aceptar'
+      });
+    }
+
+    function toastOk(mensaje) {
+      Toast.fire({
+        icon: 'success',
+        title: mensaje
+      });
     }
 
     function calcular() {
-      const pvp  = parseFloat(document.getElementById('pvp').value);
+      const pvp = parseFloat(document.getElementById('pvp').value);
       const pvpx = parseFloat(document.getElementById('pvpx').value);
-      hideWarn();
 
-      if (isNaN(pvp) || isNaN(pvpx) || pvp <= 0 || pvpx <= 0) {
-        return showWarn('Ingresa valores válidos para PVP+IVA y PVPx+IVA.');
+      if (isNaN(pvp) || isNaN(pvpx)) {
+        alertaError('Datos incompletos', 'Ingresa valores válidos para <b>PVP + IVA</b> y <b>PVPx + IVA</b>.');
+        return;
       }
+
+      if (pvp <= 0 || pvpx <= 0) {
+        alertaError('Valores inválidos', 'Los valores deben ser mayores a <b>0</b>.');
+        return;
+      }
+
       if (pvpx >= pvp) {
-        return showWarn('El PVPx+IVA debe ser menor al PVP+IVA para aplicar un descuento.');
+        alertaInfo('Validación requerida', 'El <b>PVPx + IVA</b> debe ser menor al <b>PVP + IVA</b> para aplicar un descuento.');
+        return;
       }
 
-      const valorDesc   = Math.round((pvp - pvpx) * 100) / 100;
-      const descPct     = valorDesc / pvp;
+      const valorDesc = Math.round((pvp - pvpx) * 100) / 100;
+      const descPct = valorDesc / pvp;
       const descPctDisp = descPct * 100;
-      const pvpxConf    = pvp - pvp * descPct;
+      const pvpxConf = pvp - (pvp * descPct);
 
-      // Hero
       const rDesc = document.getElementById('r-desc');
       rDesc.textContent = `${fmt(descPctDisp, 2)}%`;
       rDesc.style.color = '#00c2ff';
-      document.getElementById('r-desc-sub').textContent = `aplicar al PVP+IVA de $${fmt(pvp)}`;
 
-      // Cards
+      document.getElementById('r-desc-sub').textContent = `Aplicar al PVP+IVA de $${fmt(pvp)}`;
+
       const rValor = document.getElementById('r-valor');
       rValor.textContent = `$${fmt(valorDesc)}`;
       rValor.style.color = '#e8edf5';
@@ -289,38 +416,54 @@
       rConf.textContent = `$${fmt(pvpxConf)}`;
       rConf.style.color = '#00ffc8';
 
-      // Bar
       const pct = Math.min(100, descPctDisp);
       const barFill = document.getElementById('bar-fill');
       barFill.style.width = pct + '%';
       barFill.style.background = pct > 30
         ? 'linear-gradient(90deg,#ffb347,#ff4e6a)'
         : 'linear-gradient(90deg,#00c2ff,#00ffc8)';
+
       document.getElementById('bar-pct-txt').textContent = `${fmt(descPctDisp, 2)}%`;
 
-      // Pulse
       const hero = document.getElementById('hero-result');
       hero.classList.remove('hero-pulse');
       void hero.offsetWidth;
       hero.classList.add('hero-pulse');
+
+      toastOk('Cálculo realizado correctamente');
     }
 
     function resetear() {
       document.getElementById('pvp').value = '';
       document.getElementById('pvpx').value = '';
-      hideWarn();
+
       const rDesc = document.getElementById('r-desc');
-      rDesc.textContent = '—'; rDesc.style.color = '#5a7090';
+      rDesc.textContent = '—';
+      rDesc.style.color = '#5a7090';
+
       document.getElementById('r-desc-sub').textContent = 'ingresa los datos y calcula';
+
       const rValor = document.getElementById('r-valor');
-      rValor.textContent = '—'; rValor.style.color = '#5a7090';
+      rValor.textContent = '—';
+      rValor.style.color = '#5a7090';
+
       const rConf = document.getElementById('r-pvpx-conf');
-      rConf.textContent = '—'; rConf.style.color = '#5a7090';
+      rConf.textContent = '—';
+      rConf.style.color = '#5a7090';
+
       document.getElementById('bar-fill').style.width = '0%';
+      document.getElementById('bar-fill').style.background = 'linear-gradient(90deg,#00c2ff,#00ffc8)';
       document.getElementById('bar-pct-txt').textContent = '—';
+
+      toastOk('Formulario limpiado');
+      document.getElementById('pvp').focus();
     }
 
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        calcular();
+      }
+    });
   </script>
 </body>
 </html>

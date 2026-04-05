@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minuta Proveedores y Productos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tomato: '#FF3B1F',
+            violet: '#49267F',
+            steel: '#D9E0E8'
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-steel font-sans text-slate-800 min-h-screen">
+  <div class="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 md:p-6 mb-6">
+      <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-violet drop-shadow-sm">Minuta Proveedores y Productos</h1>
+          <p class="text-slate-600 mt-1 text-sm md:text-base">Registro, seguimiento, carga y descarga de acuerdos de la reunión mensual del equipo.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="btnDescargarPlantilla" class="px-4 py-2 rounded-2xl bg-slate-700 text-white font-semibold hover:opacity-90 transition">Descargar plantilla</button>
+          <label for="inputImportarExcel" class="px-4 py-2 rounded-2xl bg-slate-600 text-white font-semibold hover:opacity-90 transition cursor-pointer">Cargar minuta</label>
+          <input id="inputImportarExcel" type="file" accept=".xlsx,.xls" class="hidden" />
+          <button id="btnExportarResumen" class="px-4 py-2 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">Exportar resumen</button>
+          <button id="btnExportarDetalle" class="px-4 py-2 rounded-2xl bg-tomato text-white font-semibold hover:opacity-90 transition">Descargar minuta</button>
+          <button id="btnEnviarCorreo" class="px-4 py-2 rounded-2xl bg-emerald-600 text-white font-semibold hover:opacity-90 transition">Preparar correo</button>
+          <button id="btnCerrarSesionAdmin" class="px-4 py-2 rounded-2xl border border-violet text-violet bg-white font-semibold hover:bg-violet/5 transition">Cerrar sesión admin</button>
+          <button id="btnLimpiarTodo" class="px-4 py-2 rounded-2xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition">Limpiar todo</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Total acuerdos</p>
+        <p id="kpiTotal" class="text-3xl font-extrabold mt-1 text-violet">0</p>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Pendientes</p>
+        <p id="kpiPendiente" class="text-3xl font-extrabold mt-1 text-violet">0</p>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Cumplidos</p>
+        <p id="kpiCumplido" class="text-3xl font-extrabold mt-1 text-violet">0</p>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Vencidos</p>
+        <p id="kpiVencido" class="text-3xl font-extrabold mt-1 text-violet">0</p>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <h2 class="text-xl font-extrabold tracking-tight mb-4 text-violet">Datos de la reunión</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Fecha de reunión</label>
+            <input id="fechaReunion" type="date" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Tema de la reunión</label>
+            <input id="temaReunion" type="text" value="Indicadores Proveedores y Productos" readonly class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3" />
+          </div>
+          <div class="xl:col-span-2">
+            <label class="block text-sm font-semibold mb-1">Objetivo</label>
+            <textarea id="objetivoReunion" rows="3" readonly class="w-full rounded-2xl border-slate-300 bg-slate-100 text-slate-700 text-sm py-2.5 px-3">Revisar y analizar los indicadores de desempeño y las actividades ejecutadas durante el mes, con el fin de evaluar los resultados obtenidos y definir acciones de mejora que optimicen el desempeño del siguiente mes.</textarea>
+          </div>
+          <div class="xl:col-span-2 min-w-0">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+              <label class="block text-sm font-semibold">Participantes</label>
+              <label class="inline-flex items-center gap-2 text-sm font-semibold text-violet whitespace-nowrap"><input id="chkTodosParticipantes" type="checkbox" class="rounded border-slate-300 text-violet focus:ring-violet"> Seleccionar todos</label>
+            </div>
+            <div class="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-300 bg-slate-50 p-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Karelys Guzman" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Karelys Guzman</label>
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Adriana Cadena" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Adriana Cadena</label>
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Xiomara Correa" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Xiomara Correa</label>
+                <label class="flex items-center gap-2 text-sm font-medium min-w-0 break-words"><input type="checkbox" name="participantes" value="Fabricio Agurto" class="chkParticipante rounded border-slate-300 text-violet focus:ring-violet"> Fabricio Agurto</label>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Responsable de llenar la minuta</label>
+            <select id="responsableMinuta" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="">Seleccionar responsable</option>
+              <option value="Karelys Guzman">Karelys Guzman</option>
+              <option value="Adriana Cadena">Adriana Cadena</option>
+              <option value="Xiomara Correa">Xiomara Correa</option>
+              <option value="Fabricio Agurto">Fabricio Agurto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4 gap-3">
+          <h2 class="text-xl font-extrabold tracking-tight text-violet">Nuevo acuerdo</h2>
+          <button id="btnAgregarAcuerdo" type="button" class="px-5 py-2.5 rounded-2xl bg-violet text-white font-semibold hover:opacity-90 transition">Agregar</button>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="xl:col-span-2">
+            <label class="block text-sm font-semibold mb-1">Acuerdo</label>
+            <textarea id="acuerdo" rows="3" placeholder="Describe el acuerdo alcanzado" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Responsable</label>
+            <select id="responsable" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="">Seleccionar responsable</option>
+              <option value="Karelys Guzman">Karelys Guzman</option>
+              <option value="Adriana Cadena">Adriana Cadena</option>
+              <option value="Xiomara Correa">Xiomara Correa</option>
+              <option value="Fabricio Agurto">Fabricio Agurto</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Fecha compromiso</label>
+            <input id="fechaCompromiso" type="date" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Estado</label>
+            <select id="estado" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="PENDIENTE">PENDIENTE</option>
+              <option value="EN PROCESO">EN PROCESO</option>
+              <option value="CUMPLIDO">CUMPLIDO</option>
+            </select>
+          </div>
+          <div class="xl:col-span-3">
+            <label class="block text-sm font-semibold mb-1">Observaciones</label>
+            <textarea id="observaciones" rows="2" placeholder="Notas adicionales" class="w-full rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-col xl:flex-row xl:items-end gap-4 justify-between">
+          <div>
+            <h2 class="text-xl font-extrabold tracking-tight text-violet">Seguimiento de acuerdos</h2>
+            <p class="text-sm md:text-base text-slate-500 mt-1">Filtra por mes para revisar acuerdos anteriores y dar seguimiento a pendientes o vencidos.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 w-full xl:w-auto">
+            <input id="filtroTexto" type="text" placeholder="Buscar acuerdo o responsable" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm py-2.5 px-3" />
+            <select id="filtroMes" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="">Todos los meses</option>
+            </select>
+            <select id="filtroEstado" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="">Todos los estados</option>
+              <option value="PENDIENTE">PENDIENTE</option>
+              <option value="EN PROCESO">EN PROCESO</option>
+              <option value="CUMPLIDO">CUMPLIDO</option>
+              <option value="VENCIDO">VENCIDO</option>
+            </select>
+            <select id="filtroResponsable" class="rounded-2xl border-slate-300 focus:border-violet focus:ring-violet text-sm leading-5 py-2.5 px-3">
+              <option value="">Todos los responsables</option>
+              <option value="Karelys Guzman">Karelys Guzman</option>
+              <option value="Adriana Cadena">Adriana Cadena</option>
+              <option value="Xiomara Correa">Xiomara Correa</option>
+              <option value="Fabricio Agurto">Fabricio Agurto</option>
+            </select>
+            <button id="btnLimpiarFiltros" class="px-4 py-2 rounded-2xl border border-slate-300 bg-white font-semibold hover:bg-slate-50 transition">Limpiar filtros</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden ring-1 ring-white/60">
+        <div class="max-h-[70vh] overflow-auto">
+          <table class="min-w-[1700px] w-full text-[13px] md:text-sm">
+            <thead class="sticky top-0 z-20 bg-gradient-to-r from-steel to-white border-b border-slate-200 text-violet shadow-sm">
+              <tr>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Fecha reunión</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold tracking-wide bg-steel/95 backdrop-blur">Acuerdo</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Responsable</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Fecha compromiso</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Estado</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold tracking-wide bg-steel/95 backdrop-blur">Observaciones</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Acciones</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Participantes</th>
+                <th class="sticky top-0 text-left px-4 py-3.5 font-extrabold whitespace-nowrap tracking-wide bg-steel/95 backdrop-blur">Responsable minuta</th>
+              </tr>
+            </thead>
+            <tbody id="tablaAcuerdos" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'minuta_proveedores_productos_v5';
+    const TEMA_FIJO = 'Indicadores Proveedores y Productos';
+    const OBJETIVO_FIJO = 'Revisar y analizar los indicadores de desempeño y las actividades ejecutadas durante el mes, con el fin de evaluar los resultados obtenidos y definir acciones de mejora que optimicen el desempeño del siguiente mes.';
+    const DESTINATARIOS = 'adriana.cadena@cresio.com,karelys.guzman@cresio.com,xiomara.correa@cresio.com,datosmaestros@cresio.com';
+
+    let acuerdos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let editandoId = null;
+
+    const el = (id) => document.getElementById(id);
+
+    const CLAVE_ADMIN = '170290';
+    const SESSION_KEY_ADMIN = 'minuta_admin_autorizado';
+
+    function alerta(icon, title, text = '') {
+      return Swal.fire({
+        icon,
+        title,
+        text,
+        confirmButtonColor: '#49267F'
+      });
+    }
+
+    function hoyISO() {
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = String(hoy.getMonth() + 1).padStart(2, '0');
+      const d = String(hoy.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    function guardar() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(acuerdos));
+    }
+
+    function obtenerParticipantesSeleccionados() {
+      return Array.from(document.querySelectorAll('input[name="participantes"]:checked')).map(x => x.value);
+    }
+
+    function actualizarCheckTodos() {
+      const checks = Array.from(document.querySelectorAll('.chkParticipante'));
+      const todosMarcados = checks.length > 0 && checks.every(chk => chk.checked);
+      el('chkTodosParticipantes').checked = todosMarcados;
+    }
+
+    function marcarParticipantes(valores = []) {
+      document.querySelectorAll('.chkParticipante').forEach(chk => {
+        chk.checked = valores.includes(chk.value);
+      });
+      actualizarCheckTodos();
+    }
+
+    function estadoCalculado(item) {
+      if (item.estado === 'CUMPLIDO') return 'CUMPLIDO';
+      if (item.fechaCompromiso && item.fechaCompromiso < hoyISO()) return 'VENCIDO';
+      return item.estado || 'PENDIENTE';
+    }
+
+    function badgeEstado(estado) {
+      const estilos = {
+        'PENDIENTE': 'bg-amber-100 text-amber-800',
+        'EN PROCESO': 'bg-blue-100 text-blue-800',
+        'CUMPLIDO': 'bg-emerald-100 text-emerald-800',
+        'VENCIDO': 'bg-red-100 text-red-800'
+      };
+      return '<span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold ' + (estilos[estado] || 'bg-slate-100 text-slate-800') + '">' + estado + '</span>';
+    }
+
+    function limpiarFormularioAcuerdo() {
+      el('acuerdo').value = '';
+      el('responsable').value = '';
+      el('fechaCompromiso').value = '';
+      el('estado').value = 'PENDIENTE';
+      el('observaciones').value = '';
+      editandoId = null;
+      el('btnAgregarAcuerdo').textContent = 'Agregar';
+    }
+
+    function cargarEnFormulario(item) {
+      el('fechaReunion').value = item.fechaReunion || '';
+      el('temaReunion').value = TEMA_FIJO;
+      el('objetivoReunion').value = OBJETIVO_FIJO;
+      marcarParticipantes(item.participantesLista || []);
+      el('responsableMinuta').value = item.responsableMinuta || '';
+      el('acuerdo').value = item.acuerdo || '';
+      el('responsable').value = item.responsable || '';
+      el('fechaCompromiso').value = item.fechaCompromiso || '';
+      el('estado').value = item.estado || 'PENDIENTE';
+      el('observaciones').value = item.observaciones || '';
+      editandoId = item.uid;
+      el('btnAgregarAcuerdo').textContent = 'Actualizar';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function agregarOActualizar() {
+      const fechaReunion = el('fechaReunion').value;
+      const participantesLista = obtenerParticipantesSeleccionados();
+      const responsableMinuta = el('responsableMinuta').value;
+      const acuerdo = el('acuerdo').value.trim();
+      const responsable = el('responsable').value;
+      const fechaCompromiso = el('fechaCompromiso').value;
+      const estado = el('estado').value;
+      const observaciones = el('observaciones').value.trim();
+
+      if (!fechaReunion) return alerta('warning', 'Debe ingresar la fecha de la reunión.');
+      if (!responsableMinuta) return alerta('warning', 'Debe seleccionar quién llenó la minuta.');
+      if (!participantesLista.length) return alerta('warning', 'Debe seleccionar al menos un participante.');
+      if (!acuerdo) return alerta('warning', 'Debe ingresar el acuerdo.');
+      if (!responsable) return alerta('warning', 'Debe seleccionar el responsable.');
+      if (!fechaCompromiso) return alerta('warning', 'Debe ingresar la fecha compromiso.');
+
+      const previo = editandoId ? acuerdos.find(x => x.uid === editandoId) : null;
+      const registro = {
+        uid: editandoId || Date.now(),
+        fechaReunion: fechaReunion,
+        acuerdo: acuerdo,
+        responsable: responsable,
+        fechaCompromiso: fechaCompromiso,
+        estado: estado,
+        observaciones: observaciones,
+        participantesLista: participantesLista,
+        participantes: participantesLista.join(', '),
+        responsableMinuta: responsableMinuta,
+        temaReunion: TEMA_FIJO,
+        fechaRegistro: previo && previo.fechaRegistro ? previo.fechaRegistro : new Date().toISOString()
+      };
+
+      if (editandoId) {
+        acuerdos = acuerdos.map(item => item.uid === editandoId ? registro : item);
+      } else {
+        acuerdos.unshift(registro);
+      }
+
+      const mensaje = editandoId ? 'Acuerdo actualizado correctamente.' : 'Acuerdo agregado correctamente.';
+      editandoId = null;
+      guardar();
+      render();
+      limpiarFormularioAcuerdo();
+      alerta('success', mensaje);
+    }
+
+    async function eliminarAcuerdo(uid) {
+      const autorizado = await solicitarClaveAdmin();
+      if (!autorizado) return;
+      Swal.fire({
+        icon: 'question',
+        title: '¿Deseas eliminar este acuerdo?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#FF3B1F',
+        cancelButtonColor: '#49267F'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        acuerdos = acuerdos.filter(item => item.uid !== uid);
+        guardar();
+        render();
+        alerta('success', 'Acuerdo eliminado correctamente.');
+      });
+    }
+
+    async function duplicarAcuerdo(uid) {
+      const autorizado = await solicitarClaveAdmin();
+      if (!autorizado) return;
+      const item = acuerdos.find(x => x.uid === uid);
+      if (!item) return;
+      const nuevaFechaReunion = el('fechaReunion').value || hoyISO();
+      const duplicado = {
+        uid: Date.now(),
+        fechaReunion: nuevaFechaReunion,
+        acuerdo: item.acuerdo,
+        responsable: item.responsable,
+        fechaCompromiso: item.fechaCompromiso,
+        estado: 'PENDIENTE',
+        observaciones: item.observaciones ? item.observaciones + ' | Reprogramado desde ' + item.fechaReunion : 'Reprogramado desde ' + item.fechaReunion,
+        participantesLista: item.participantesLista || [],
+        participantes: item.participantes || '',
+        responsableMinuta: item.responsableMinuta || '',
+        temaReunion: TEMA_FIJO,
+        fechaRegistro: new Date().toISOString()
+      };
+      acuerdos.unshift(duplicado);
+      guardar();
+      render();
+      alerta('success', 'Acuerdo duplicado correctamente para el siguiente periodo.');
+    }
+
+    function filtrarDatos() {
+      const texto = el('filtroTexto').value.trim().toLowerCase();
+      const mes = el('filtroMes').value;
+      const estado = el('filtroEstado').value;
+      const responsable = el('filtroResponsable').value;
+
+      return acuerdos.filter(item => {
+        const estadoFinal = estadoCalculado(item);
+        const matchTexto = !texto ||
+          (item.acuerdo || '').toLowerCase().includes(texto) ||
+          (item.responsable || '').toLowerCase().includes(texto) ||
+          (item.responsableMinuta || '').toLowerCase().includes(texto) ||
+          (item.observaciones || '').toLowerCase().includes(texto) ||
+          (item.participantes || '').toLowerCase().includes(texto);
+        const matchMes = !mes || (item.fechaReunion || '').slice(0, 7) === mes;
+        const matchEstado = !estado || estadoFinal === estado;
+        const matchResponsable = !responsable || item.responsable === responsable;
+        return matchTexto && matchMes && matchEstado && matchResponsable;
+      });
+    }
+
+    function actualizarOpcionesMes() {
+      const select = el('filtroMes');
+      const actual = select.value;
+      const meses = [...new Set(acuerdos.map(x => (x.fechaReunion || '').slice(0, 7)).filter(Boolean))].sort().reverse();
+      const nombresMes = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      select.innerHTML = '<option value="">Todos los meses</option>' + meses.map(m => {
+        const partes = m.split('-');
+        const anio = partes[0];
+        const mes = partes[1];
+        return '<option value="' + m + '">' + nombresMes[Number(mes) - 1] + ' ' + anio + '</option>';
+      }).join('');
+      if ([...select.options].some(opt => opt.value === actual)) select.value = actual;
+    }
+
+    function renderKPIs(data) {
+      el('kpiTotal').textContent = data.length;
+      el('kpiPendiente').textContent = data.filter(x => ['PENDIENTE', 'EN PROCESO'].includes(estadoCalculado(x))).length;
+      el('kpiCumplido').textContent = data.filter(x => estadoCalculado(x) === 'CUMPLIDO').length;
+      el('kpiVencido').textContent = data.filter(x => estadoCalculado(x) === 'VENCIDO').length;
+    }
+
+    function renderTabla(data) {
+      const tbody = el('tablaAcuerdos');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-10 text-center text-slate-500 font-medium">No hay acuerdos registrados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => {
+        const estado = estadoCalculado(item);
+        return '' +
+          '<tr class="hover:bg-white/80 align-top even:bg-slate-50/60 transition-colors">' +
+            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.fechaReunion || '') + '</td>' +
+            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[420px] font-medium text-slate-700">' + (item.acuerdo || '') + '</td>' +
+            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.responsable || '') + '</td>' +
+            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.fechaCompromiso || '') + '</td>' +
+            '<td class="px-4 py-4">' + badgeEstado(estado) + '</td>' +
+            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">' + (item.observaciones || '') + '</td>' +
+            '<td class="px-4 py-4">' +
+              '<div class="flex flex-col gap-2 min-w-[110px]">' +
+                '<button onclick="editarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-violet text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Editar</button>' +
+                '<button onclick="duplicarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Duplicar</button>' +
+                '<button onclick="eliminarAcuerdo(' + item.uid + ')" class="px-3 py-2 rounded-xl bg-tomato text-white text-xs font-bold shadow-sm hover:opacity-90 transition">Eliminar</button>' +
+              '</div>' +
+            '</td>' +
+            '<td class="px-4 py-4 whitespace-normal break-words leading-6 min-w-[260px] text-slate-700">' + (item.participantes || '') + '</td>' +
+            '<td class="px-4 py-4 whitespace-nowrap font-medium">' + (item.responsableMinuta || '') + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function render() {
+      actualizarOpcionesMes();
+      const data = filtrarDatos();
+      renderKPIs(data);
+      renderTabla(data);
+    }
+
+    function sesionAdminActiva() {
+      return sessionStorage.getItem(SESSION_KEY_ADMIN) === 'SI';
+    }
+
+    function activarSesionAdmin() {
+      sessionStorage.setItem(SESSION_KEY_ADMIN, 'SI');
+    }
+
+    function cerrarSesionAdmin() {
+      sessionStorage.removeItem(SESSION_KEY_ADMIN);
+    }
+
+    async function solicitarClaveAdmin() {
+      if (sesionAdminActiva()) return true;
+      const result = await Swal.fire({
+        title: 'Clave requerida',
+        text: 'Ingresa la contraseña de administrador para continuar.',
+        input: 'password',
+        inputPlaceholder: 'Contraseña',
+        inputAttributes: {
+          autocapitalize: 'off',
+          autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Validar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#49267F',
+        cancelButtonColor: '#94A3B8',
+        inputValidator: (value) => {
+          if (!value) return 'Debes ingresar la contraseña.';
+          return null;
+        }
+      });
+
+      if (!result.isConfirmed) return false;
+      if (result.value !== CLAVE_ADMIN) {
+        await alerta('error', 'Contraseña incorrecta.', 'No tienes permiso para realizar esta acción.');
+        return false;
+      }
+      activarSesionAdmin();
+      await alerta('success', 'Acceso autorizado.', 'La sesión de administrador estará activa mientras mantengas abierta esta pestaña.');
+      return true;
+    }
+
+    async function editarAcuerdo(uid) {
+      const autorizado = await solicitarClaveAdmin();
+      if (!autorizado) return;
+      const item = acuerdos.find(x => x.uid === uid);
+      if (!item) return;
+      cargarEnFormulario(item);
+    }
+
+    function formatoDDMMYYYY(valor) {
+      if (!valor) return '';
+      const partes = String(valor).split('-');
+      if (partes.length !== 3) return String(valor);
+      return partes[2] + '-' + partes[1] + '-' + partes[0];
+    }
+
+    function excelDateToISO(valor) {
+      if (valor === null || valor === undefined || valor === '') return '';
+
+      if (typeof valor === 'number' && !Number.isNaN(valor)) {
+        const fecha = new Date(Math.round((valor - 25569) * 86400 * 1000));
+        const y = fecha.getFullYear();
+        const m = String(fecha.getMonth() + 1).padStart(2, '0');
+        const d = String(fecha.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
+      }
+
+      const texto = String(valor).trim();
+      if (!texto) return '';
+
+      if (/^\d{5}$/.test(texto)) {
+        const serial = Number(texto);
+        const fecha = new Date(Math.round((serial - 25569) * 86400 * 1000));
+        const y = fecha.getFullYear();
+        const m = String(fecha.getMonth() + 1).padStart(2, '0');
+        const d = String(fecha.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + d;
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(texto)) return texto;
+
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(texto)) {
+        const partes = texto.split('/');
+        return partes[2] + '-' + partes[1] + '-' + partes[0];
+      }
+
+      if (/^\d{2}-\d{2}-\d{4}$/.test(texto)) {
+        const partes = texto.split('-');
+        return partes[2] + '-' + partes[1] + '-' + partes[0];
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}T/.test(texto)) {
+        return texto.slice(0, 10);
+      }
+
+      return texto;
+    }
+
+    function fechaRegistroVisible(valor) {
+      const iso = excelDateToISO(valor);
+      return formatoDDMMYYYY(iso);
+    }
+
+    function exportarExcel(tipo) {
+      const data = filtrarDatos();
+      if (!data.length) {
+        alerta('warning', 'No hay información para exportar.');
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+      if (tipo === 'detalle') {
+        const detalle = data.map(item => ({
+          'Fecha reunión': formatoDDMMYYYY(item.fechaReunion),
+          'Acuerdo': item.acuerdo,
+          'Responsable': item.responsable,
+          'Fecha compromiso': formatoDDMMYYYY(item.fechaCompromiso),
+          'Estado registrado': item.estado,
+          'Estado final': estadoCalculado(item),
+          'Observaciones': item.observaciones,
+          'Participantes': item.participantes,
+          'Responsable minuta': item.responsableMinuta,
+          'Fecha registro': fechaRegistroVisible(item.fechaRegistro)
+        }));
+        const ws = XLSX.utils.json_to_sheet(detalle);
+        ws['!cols'] = [
+          { wch: 14 }, { wch: 55 }, { wch: 22 }, { wch: 16 }, { wch: 18 },
+          { wch: 14 }, { wch: 35 }, { wch: 35 }, { wch: 24 }, { wch: 22 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws, 'Detalle');
+        XLSX.writeFile(wb, 'Minuta_Detalle_Acuerdos.xlsx');
+        return;
+      }
+
+      const agrupado = {};
+      data.forEach(item => {
+        const clave = item.fechaReunion + '__' + item.responsableMinuta;
+        if (!agrupado[clave]) {
+          agrupado[clave] = {
+            'Fecha reunión': formatoDDMMYYYY(item.fechaReunion),
+            'Participantes': item.participantes,
+            'Responsable minuta': item.responsableMinuta,
+            'Total acuerdos': 0,
+            'Pendientes': 0,
+            'Cumplidos': 0,
+            'Vencidos': 0
+          };
+        }
+        agrupado[clave]['Total acuerdos'] += 1;
+        const est = estadoCalculado(item);
+        if (est === 'CUMPLIDO') agrupado[clave]['Cumplidos'] += 1;
+        else if (est === 'VENCIDO') agrupado[clave]['Vencidos'] += 1;
+        else agrupado[clave]['Pendientes'] += 1;
+      });
+
+      const resumen = Object.values(agrupado);
+      const ws = XLSX.utils.json_to_sheet(resumen);
+      ws['!cols'] = [{ wch: 14 }, { wch: 35 }, { wch: 24 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+      XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
+      XLSX.writeFile(wb, 'Minuta_Resumen_Reuniones.xlsx');
+    }
+
+    function descargarPlantilla() {
+      const wb = XLSX.utils.book_new();
+      const plantilla = [{
+        'Fecha reunión': '',
+        'Acuerdo': '',
+        'Responsable': '',
+        'Fecha compromiso': '',
+        'Estado registrado': 'PENDIENTE',
+        'Observaciones': '',
+        'Participantes': '',
+        'Responsable minuta': '',
+        'Fecha registro': ''
+      }];
+      const ws = XLSX.utils.json_to_sheet(plantilla);
+      ws['!cols'] = [
+        { wch: 14 }, { wch: 55 }, { wch: 22 }, { wch: 16 }, { wch: 18 },
+        { wch: 35 }, { wch: 35 }, { wch: 24 }, { wch: 22 }
+      ];
+      XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
+      XLSX.writeFile(wb, 'Plantilla_Minuta_Proveedores_y_Productos.xlsx');
+    }
+
+    function normalizarFilaImportada(row) {
+      const fechaReunion = excelDateToISO(row['Fecha reunión'] || row['Fecha reunion'] || '');
+      const acuerdo = String(row['Acuerdo'] || '').trim();
+      const responsable = String(row['Responsable'] || '').trim();
+      const fechaCompromiso = excelDateToISO(row['Fecha compromiso'] || '');
+      const estado = String(row['Estado registrado'] || row['Estado'] || 'PENDIENTE').trim().toUpperCase();
+      const observaciones = String(row['Observaciones'] || '').trim();
+      const participantes = String(row['Participantes'] || '').trim();
+      const responsableMinuta = String(row['Responsable minuta'] || '').trim();
+      const participantesLista = participantes ? participantes.split(',').map(x => x.trim()).filter(Boolean) : [];
+      const fechaRegistroImportada = excelDateToISO(row['Fecha registro'] || '') || new Date().toISOString().slice(0, 10);
+
+      if (!fechaReunion || !acuerdo || !responsable || !fechaCompromiso) return null;
+
+      return {
+        uid: Date.now() + Math.floor(Math.random() * 100000),
+        fechaReunion: fechaReunion,
+        acuerdo: acuerdo,
+        responsable: responsable,
+        fechaCompromiso: fechaCompromiso,
+        estado: ['PENDIENTE', 'EN PROCESO', 'CUMPLIDO'].includes(estado) ? estado : 'PENDIENTE',
+        observaciones: observaciones,
+        participantesLista: participantesLista,
+        participantes: participantes,
+        responsableMinuta: responsableMinuta,
+        temaReunion: TEMA_FIJO,
+        fechaRegistro: fechaRegistroImportada
+      };
+    }
+
+    function importarExcel(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array', cellDates: false, raw: true });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(firstSheet, { defval: '', raw: true });
+          const registros = json.map(normalizarFilaImportada).filter(Boolean);
+
+          if (!registros.length) {
+            alerta('warning', 'El archivo no contiene filas válidas para importar.', 'Verifica que tenga las columnas esperadas y fechas válidas.');
+            return;
+          }
+
+          acuerdos = registros.concat(acuerdos);
+          guardar();
+          render();
+          alerta('success', 'Minuta cargada correctamente.', 'Se importaron ' + registros.length + ' acuerdo(s).');
+          el('inputImportarExcel').value = '';
+        } catch (error) {
+          console.error(error);
+          alerta('error', 'No se pudo cargar el archivo.', 'Verifica que el Excel tenga el formato esperado.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function generarResumenCorreo() {
+      const data = filtrarDatos();
+      if (!data.length) return 'No hay acuerdos registrados.';
+
+      const agrupado = {};
+      data.forEach(item => {
+        if (!agrupado[item.responsable]) agrupado[item.responsable] = [];
+        agrupado[item.responsable].push(item);
+      });
+
+      let texto = '';
+      Object.keys(agrupado).forEach(resp => {
+        texto += resp + ':' + '\n';
+        agrupado[resp].forEach(x => {
+          texto += '  - ' + x.acuerdo + '\n';
+          texto += '    Fecha: ' + formatoDDMMYYYY(x.fechaCompromiso) + ' | Estado: ' + estadoCalculado(x) + '\n';
+        });
+        texto += '\n';
+      });
+
+      return texto.trim();
+    }
+
+    function enviarCorreo() {
+      const data = filtrarDatos();
+      if (!data.length) {
+        alerta('warning', 'No hay acuerdos registrados para preparar el correo.');
+        return;
+      }
+      exportarExcel('detalle');
+      const asunto = encodeURIComponent('Minuta de reunión - Indicadores Proveedores y Productos');
+      const cuerpoPlano = [
+        'Buenas tardes,',
+        '',
+        'Adjunto se remite la minuta de la reunión Indicadores Proveedores y Productos.',
+        '',
+        'Resumen de acuerdos:',
+        generarResumenCorreo(),
+        '',
+        'Nota: el archivo Excel se descarga automáticamente y debe adjuntarse manualmente al correo.',
+        '',
+        'Saludos'
+      ].join('\n');
+      const cuerpo = encodeURIComponent(cuerpoPlano);
+      window.location.href = 'mailto:' + DESTINATARIOS + '?subject=' + asunto + '&body=' + cuerpo;
+    }
+
+    el('temaReunion').value = TEMA_FIJO;
+    el('objetivoReunion').value = OBJETIVO_FIJO;
+
+    el('chkTodosParticipantes').addEventListener('change', (e) => {
+      document.querySelectorAll('.chkParticipante').forEach(chk => {
+        chk.checked = e.target.checked;
+      });
+    });
+
+    document.querySelectorAll('.chkParticipante').forEach(chk => {
+      chk.addEventListener('change', actualizarCheckTodos);
+    });
+
+    el('btnAgregarAcuerdo').addEventListener('click', agregarOActualizar);
+    el('btnExportarResumen').addEventListener('click', () => exportarExcel('resumen'));
+    el('btnExportarDetalle').addEventListener('click', () => exportarExcel('detalle'));
+    el('btnDescargarPlantilla').addEventListener('click', descargarPlantilla);
+    el('btnEnviarCorreo').addEventListener('click', enviarCorreo);
+    el('inputImportarExcel').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) importarExcel(file);
+    });
+
+    ['filtroTexto', 'filtroMes', 'filtroEstado', 'filtroResponsable'].forEach(id => {
+      el(id).addEventListener('input', render);
+      el(id).addEventListener('change', render);
+    });
+
+    el('btnLimpiarFiltros').addEventListener('click', () => {
+      el('filtroTexto').value = '';
+      el('filtroMes').value = '';
+      el('filtroEstado').value = '';
+      el('filtroResponsable').value = '';
+      render();
+    });
+
+    el('btnCerrarSesionAdmin').addEventListener('click', () => {
+      if (!sesionAdminActiva()) {
+        alerta('info', 'No hay sesión activa.', 'Todavía no has validado la contraseña de administrador en esta pestaña.');
+        return;
+      }
+      cerrarSesionAdmin();
+      alerta('success', 'Sesión cerrada.', 'La próxima acción protegida volverá a pedir la contraseña.');
+    });
+
+    el('btnLimpiarTodo').addEventListener('click', () => {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Esto eliminará todos los acuerdos guardados en este navegador.',
+        text: '¿Deseas continuar?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, limpiar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#FF3B1F',
+        cancelButtonColor: '#49267F'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        acuerdos = [];
+        guardar();
+        limpiarFormularioAcuerdo();
+        el('fechaReunion').value = '';
+        el('responsableMinuta').value = '';
+        marcarParticipantes([]);
+        render();
+        alerta('success', 'Información eliminada correctamente.');
+      });
+    });
+
+    window.editarAcuerdo = editarAcuerdo;
+    window.duplicarAcuerdo = duplicarAcuerdo;
+    window.eliminarAcuerdo = eliminarAcuerdo;
+
+    render();
+  </script>
+</body>
+</html>
