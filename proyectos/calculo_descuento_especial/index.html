@@ -25,9 +25,20 @@
   --muted:#5a7090;
 }
 
+*{box-sizing:border-box}
+html,body{
+  width:100%;
+  overflow-x:hidden;
+}
+
 body{
+  margin:0;
   font-family:'Barlow',sans-serif;
-  background:var(--bg);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,194,255,0.07), transparent),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,48,80,0.25) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,48,80,0.12) 40px),
+    var(--bg);
   color:var(--text);
   min-height:100vh;
 }
@@ -40,15 +51,23 @@ body{
   border:1px solid var(--s500);
   border-radius:12px;
   color:var(--text);
-  font-family:'Rajdhani';
+  font-family:'Rajdhani',sans-serif;
   font-size:clamp(1rem,3.5vw,1.4rem);
+  font-weight:600;
   padding:14px 44px 14px 14px;
   min-height:52px;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s, transform .2s;
+}
+
+.custom-input::placeholder{
+  color:var(--muted);
 }
 
 .custom-input:focus{
   border-color:var(--cyan);
   box-shadow:0 0 0 3px rgba(0,194,255,.15);
+  transform:translateY(-1px);
 }
 
 .iva-btn{
@@ -57,14 +76,24 @@ body{
   border-radius:10px;
   border:1px solid var(--s500);
   color:var(--muted);
-  font-family:'Rajdhani';
-  font-weight:600;
+  background:var(--s800);
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+  font-size:clamp(1rem,3vw,1.25rem);
+  cursor:pointer;
+  transition:all .2s ease;
+}
+
+.iva-btn:hover{
+  border-color:var(--cyan);
+  color:var(--text);
 }
 
 .iva-btn.active{
   border-color:var(--cyan);
   color:var(--cyan);
   background:rgba(0,194,255,.1);
+  box-shadow:0 0 0 2px rgba(0,194,255,.12);
 }
 
 .result-text{
@@ -72,16 +101,56 @@ body{
   overflow-wrap:anywhere;
 }
 
-/* SweetAlert estilo */
+.hero-pulse{
+  animation:pulseGlow .9s ease;
+}
+
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,194,255,0);}
+  50%{box-shadow:0 0 20px 4px rgba(0,194,255,.18);}
+}
+
+/* SweetAlert2 estilo modal */
 .swal2-popup{
   background:#131929 !important;
   border-radius:18px !important;
   border:1px solid rgba(0,194,255,.2) !important;
+  color:#e8edf5 !important;
+  padding:2rem 1.4rem 1.2rem !important;
+}
+
+.swal2-title,
+.swal2-html-container{
+  color:#e8edf5 !important;
+}
+
+.swal2-title{
+  font-size:2rem !important;
+  font-weight:700 !important;
+}
+
+.swal2-html-container{
+  font-size:1rem !important;
+  line-height:1.5 !important;
 }
 
 .swal2-confirm{
   background:linear-gradient(135deg,#00c2ff,#00ffc8)!important;
-  color:#000!important;
+  color:#081018 !important;
+  font-weight:700 !important;
+  border-radius:10px !important;
+  padding:.75rem 1.5rem !important;
+  box-shadow:none !important;
+}
+
+.swal2-icon.swal2-error,
+.swal2-icon.swal2-warning{
+  border-color:#ff7a7a !important;
+  color:#ff7a7a !important;
+}
+
+.swal2-timer-progress-bar{
+  background:#00c2ff !important;
 }
 </style>
 </head>
@@ -89,152 +158,243 @@ body{
 <body class="pb-10">
 
 <header class="bg-[#0d1525] border-b border-[#1e3050]">
-<div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
-<div class="w-10 h-10 border border-cyan-400 flex items-center justify-center rounded-lg">
-<span class="font-display text-cyan-400 font-bold">%</span>
-</div>
-<div>
-<h1 class="font-display text-lg sm:text-2xl font-bold tracking-wide">
-<span class="text-cyan-400">Cálculo</span> Descuento Especial
-</h1>
-<p class="text-xs text-gray-400">Herramienta de margen</p>
-</div>
-</div>
+  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+    <div class="w-10 h-10 border border-cyan-400 flex items-center justify-center rounded-lg shrink-0">
+      <span class="font-display text-cyan-400 font-bold">%</span>
+    </div>
+    <div class="min-w-0">
+      <h1 class="font-display text-lg sm:text-2xl font-bold tracking-wide leading-tight">
+        <span class="text-cyan-400">Cálculo</span> Descuento Especial
+      </h1>
+      <p class="text-xs text-gray-400">Herramienta de margen y precio especial</p>
+    </div>
+  </div>
 </header>
 
 <main class="max-w-6xl mx-auto px-4 mt-6">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<!-- INPUT -->
-<div class="bg-[#131929] border border-[#1e3050] rounded-2xl p-5">
+    <!-- INPUT -->
+    <div class="bg-[#131929] border border-[#1e3050] rounded-2xl p-5">
+      <div class="mb-5 text-xs uppercase tracking-[0.18em] text-cyan-400 font-semibold">Datos del producto</div>
 
-<div class="mb-5 text-xs uppercase text-cyan-400">Datos</div>
+      <div class="flex flex-col gap-4">
 
-<div class="flex flex-col gap-4">
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-[0.12em] mb-2">% IVA</label>
+          <div class="flex gap-2 mt-2">
+            <button type="button" class="iva-btn" onclick="selectIva(0)" id="iva0">0%</button>
+            <button type="button" class="iva-btn" onclick="selectIva(15)" id="iva15">15%</button>
+          </div>
+          <input type="hidden" id="iva">
+        </div>
 
-<div>
-<label class="text-xs text-gray-400">% IVA</label>
-<div class="flex gap-2 mt-2">
-<button class="iva-btn" onclick="selectIva(0)" id="iva0">0%</button>
-<button class="iva-btn" onclick="selectIva(15)" id="iva15">15%</button>
-</div>
-<input type="hidden" id="iva">
-</div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-[0.12em] mb-1.5">PVP + IVA</label>
+          <div class="relative">
+            <input id="pvp" type="number" class="custom-input" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">$</span>
+          </div>
+        </div>
 
-<div>
-<label class="text-xs text-gray-400">PVP + IVA</label>
-<input id="pvp" type="number" class="custom-input" placeholder="0.00">
-</div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-[0.12em] mb-1.5">Costo sin IVA</label>
+          <div class="relative">
+            <input id="costo" type="number" class="custom-input" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">$</span>
+          </div>
+        </div>
 
-<div>
-<label class="text-xs text-gray-400">Costo sin IVA</label>
-<input id="costo" type="number" class="custom-input" placeholder="0.00">
-</div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-[0.12em] mb-1.5">Utilidad a aplicar (%)</label>
+          <div class="relative">
+            <input id="utilidad" type="number" class="custom-input" placeholder="0" step="0.01" min="0" max="99.99" inputmode="decimal">
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none">%</span>
+          </div>
+        </div>
 
-<div>
-<label class="text-xs text-gray-400">Utilidad (%)</label>
-<input id="utilidad" type="number" class="custom-input" placeholder="0">
-</div>
+      </div>
 
-</div>
+      <button onclick="calcular()" class="mt-5 w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-teal-300 text-black font-bold uppercase tracking-[0.14em]">
+        Calcular
+      </button>
 
-<button onclick="calcular()" class="mt-5 w-full py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-teal-300 text-black font-bold">
-Calcular
-</button>
+      <button onclick="resetear()" class="mt-2 w-full text-sm text-gray-400 border border-[#1e3050] rounded-xl py-2 hover:text-slate-200 hover:border-[#35527b] transition-all">
+        ↺ Limpiar
+      </button>
+    </div>
 
-<button onclick="resetear()" class="mt-2 w-full text-sm text-gray-400 border border-[#1e3050] rounded-xl py-2">
-Limpiar
-</button>
+    <!-- RESULTADOS -->
+    <div class="bg-[#131929] border border-[#1e3050] rounded-2xl p-5 flex flex-col gap-4">
+      <div class="text-xs uppercase tracking-[0.18em] text-cyan-400 font-semibold">Resultados</div>
 
-</div>
+      <div id="hero" class="bg-[#1a2236] p-4 rounded-xl border border-[#1e3050]">
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-xs text-gray-400 uppercase tracking-[0.12em] mb-1">Descuento porcentual</p>
+            <p id="desc" class="font-display text-[clamp(2rem,8vw,4rem)] result-text text-[#5a7090] leading-none">—</p>
+            <p id="descSub" class="text-[11px] text-gray-500 mt-2">Ingresa los datos y calcula</p>
+          </div>
 
-<!-- RESULTADOS -->
-<div class="bg-[#131929] border border-[#1e3050] rounded-2xl p-5 flex flex-col gap-4">
+          <div class="text-left sm:text-right min-w-0">
+            <p class="text-xs text-gray-400 uppercase tracking-[0.12em] mb-1">Precio especial + IVA</p>
+            <p id="precio" class="font-display text-[clamp(1.8rem,6vw,3rem)] result-text text-[#5a7090] leading-none">—</p>
+            <p id="precioSub" class="text-[11px] text-gray-500 mt-2">&nbsp;</p>
+          </div>
+        </div>
+      </div>
 
-<div class="text-xs uppercase text-cyan-400">Resultados</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="bg-[#1a2236] p-3 rounded-xl border border-[#1e3050]">
+          <p class="text-xs text-gray-400 uppercase tracking-[0.12em]">Costo + IVA</p>
+          <p id="costoiva" class="result-text text-lg mt-1 text-[#5a7090]">—</p>
+        </div>
 
-<div class="bg-[#1a2236] p-4 rounded-xl">
+        <div class="bg-[#1a2236] p-3 rounded-xl border border-[#1e3050]">
+          <p class="text-xs text-gray-400 uppercase tracking-[0.12em]">Rentabilidad</p>
+          <p id="rentabilidad" class="result-text text-lg mt-1 text-[#5a7090]">—</p>
+        </div>
+      </div>
 
-<div class="flex flex-col sm:flex-row justify-between gap-4">
+      <div class="bg-[#1a2236] p-3 rounded-xl border border-[#1e3050]">
+        <div class="flex justify-between items-center gap-3 mb-2">
+          <p class="text-xs text-gray-400 uppercase tracking-[0.12em]">Margen actual sobre PVP</p>
+          <p id="rentabilidadBarText" class="text-sm text-gray-400">—</p>
+        </div>
+        <div class="h-2 w-full rounded-full bg-[#283247] overflow-hidden">
+          <div id="barFill" class="h-full w-0 rounded-full transition-all duration-500" style="background:linear-gradient(90deg,#00c2ff,#00ffc8);"></div>
+        </div>
+      </div>
+    </div>
 
-<div>
-<p class="text-xs text-gray-400">Descuento</p>
-<p id="desc" class="font-display text-[clamp(2rem,8vw,4rem)] result-text">—</p>
-</div>
-
-<div class="text-left sm:text-right">
-<p class="text-xs text-gray-400">Precio Especial</p>
-<p id="precio" class="font-display text-[clamp(1.8rem,6vw,3rem)] result-text">—</p>
-</div>
-
-</div>
-
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<div class="bg-[#1a2236] p-3 rounded-xl">
-<p class="text-xs text-gray-400">Costo + IVA</p>
-<p id="costoiva" class="result-text">—</p>
-</div>
-
-<div class="bg-[#1a2236] p-3 rounded-xl">
-<p class="text-xs text-gray-400">Rentabilidad</p>
-<p id="rentabilidad" class="result-text">—</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
+  </div>
 </main>
 
 <script>
-const Toast = Swal.mixin({
-toast:true,
-position:'top-end',
-showConfirmButton:false,
-timer:2500
-});
-
-function selectIva(v){
-document.getElementById('iva').value=v;
-document.getElementById('iva0').classList.toggle('active',v==0);
-document.getElementById('iva15').classList.toggle('active',v==15);
+function showAlert(title, message, icon = 'error') {
+  Swal.fire({
+    icon: icon,
+    title: title,
+    html: message,
+    confirmButtonText: 'Entendido',
+    allowOutsideClick: true,
+    allowEscapeKey: true
+  });
 }
 
-function fmt(n){return n.toLocaleString('es-EC',{minimumFractionDigits:2});}
+function showSuccessToast(message) {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'success',
+    title: message,
+    showConfirmButton: false,
+    timer: 2200,
+    timerProgressBar: true,
+    background: '#131929',
+    color: '#e8edf5'
+  });
+}
+
+function selectIva(v){
+  document.getElementById('iva').value = v;
+  document.getElementById('iva0').classList.toggle('active', v === 0);
+  document.getElementById('iva15').classList.toggle('active', v === 15);
+}
+
+function fmt(n){
+  return n.toLocaleString('es-EC', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
 
 function calcular(){
+  const ivaRaw = document.getElementById('iva').value;
+  const pvp = parseFloat(document.getElementById('pvp').value);
+  const costo = parseFloat(document.getElementById('costo').value);
+  const util = parseFloat(document.getElementById('utilidad').value);
 
-const iva=parseFloat(document.getElementById('iva').value)/100;
-const pvp=parseFloat(document.getElementById('pvp').value);
-const costo=parseFloat(document.getElementById('costo').value);
-const util=parseFloat(document.getElementById('utilidad').value);
+  if (ivaRaw === '') {
+    showAlert('Datos incompletos', 'Por favor selecciona el % IVA (0% o 15%).', 'error');
+    return;
+  }
 
-if(isNaN(iva)) return Toast.fire({icon:'warning',title:'Selecciona IVA'});
-if(isNaN(pvp)||isNaN(costo)) return Toast.fire({icon:'warning',title:'Datos inválidos'});
+  if (isNaN(pvp) || pvp <= 0) {
+    showAlert('Datos incompletos', 'Ingresa un valor válido para <b>PVP + IVA</b>.', 'error');
+    return;
+  }
 
-const costoIVA=costo*(1+iva);
-const precio=costoIVA/(1-util/100);
-const desc=((pvp-precio)/pvp)*100;
+  if (isNaN(costo) || costo <= 0) {
+    showAlert('Datos incompletos', 'Ingresa un valor válido para <b>Costo sin IVA</b>.', 'error');
+    return;
+  }
 
-document.getElementById('desc').innerText=fmt(desc)+'%';
-document.getElementById('precio').innerText='$'+fmt(precio);
-document.getElementById('costoiva').innerText='$'+fmt(costoIVA);
-document.getElementById('rentabilidad').innerText=fmt((pvp-costoIVA)/pvp*100)+'%';
+  if (isNaN(util) || util <= 0 || util >= 100) {
+    showAlert('Datos incompletos', 'Ingresa un valor válido para <b>Utilidad a aplicar</b>. Debe ser mayor a 0 y menor a 100.', 'error');
+    return;
+  }
 
-Toast.fire({icon:'success',title:'Cálculo listo'});
+  const iva = parseFloat(ivaRaw) / 100;
+  const costoIVA = costo * (1 + iva);
+  const precio = costoIVA / (1 - util / 100);
+  const desc = ((pvp - precio) / pvp) * 100;
+  const rent = ((pvp - costoIVA) / pvp) * 100;
+
+  document.getElementById('desc').innerText = fmt(desc) + '%';
+  document.getElementById('precio').innerText = '$' + fmt(precio);
+  document.getElementById('costoiva').innerText = '$' + fmt(costoIVA);
+  document.getElementById('rentabilidad').innerText = fmt(rent) + '%';
+  document.getElementById('rentabilidadBarText').innerText = fmt(rent) + '%';
+  document.getElementById('descSub').innerText = 'Descuento a aplicar sobre PVP';
+  document.getElementById('precioSub').innerText = 'Precio calculado con utilidad aplicada';
+
+  document.getElementById('desc').style.color = '#00c2ff';
+  document.getElementById('precio').style.color = '#00ffc8';
+  document.getElementById('costoiva').style.color = '#e8edf5';
+  document.getElementById('rentabilidad').style.color = rent >= util ? '#00ffc8' : '#ffb347';
+
+  const pct = Math.max(0, Math.min(100, rent));
+  const barFill = document.getElementById('barFill');
+  barFill.style.width = pct + '%';
+  barFill.style.background = rent >= util
+    ? 'linear-gradient(90deg,#00c2ff,#00ffc8)'
+    : 'linear-gradient(90deg,#ffb347,#ff4e6a)';
+
+  const hero = document.getElementById('hero');
+  hero.classList.remove('hero-pulse');
+  void hero.offsetWidth;
+  hero.classList.add('hero-pulse');
+
+  showSuccessToast('Cálculo realizado correctamente.');
 }
 
 function resetear(){
-['pvp','costo','utilidad'].forEach(id=>document.getElementById(id).value='');
-['desc','precio','costoiva','rentabilidad'].forEach(id=>document.getElementById(id).innerText='—');
-document.getElementById('iva').value='';
-document.getElementById('iva0').classList.remove('active');
-document.getElementById('iva15').classList.remove('active');
+  ['pvp','costo','utilidad'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+
+  ['desc','precio','costoiva','rentabilidad','rentabilidadBarText'].forEach(id => {
+    document.getElementById(id).innerText = '—';
+  });
+
+  document.getElementById('desc').style.color = '#5a7090';
+  document.getElementById('precio').style.color = '#5a7090';
+  document.getElementById('costoiva').style.color = '#5a7090';
+  document.getElementById('rentabilidad').style.color = '#5a7090';
+
+  document.getElementById('descSub').innerText = 'Ingresa los datos y calcula';
+  document.getElementById('precioSub').innerHTML = '&nbsp;';
+  document.getElementById('iva').value = '';
+  document.getElementById('iva0').classList.remove('active');
+  document.getElementById('iva15').classList.remove('active');
+  document.getElementById('barFill').style.width = '0%';
+  document.getElementById('barFill').style.background = 'linear-gradient(90deg,#00c2ff,#00ffc8)';
 }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') calcular();
+});
 </script>
 
 </body>
